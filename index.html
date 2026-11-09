@@ -26,20 +26,20 @@
   .pane { display: none; } .pane.on { display: block; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
   h1 { margin: 0 0 4px; font-size: 18px; }
-  .note { font-size: 11px; color: var(--muted); }
+  .note { font-size: 13px; color: var(--muted); }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
-  .sec { font-size: 13px; font-weight: 700; margin: 4px 0 10px; padding-bottom: 4px; border-bottom: 1px solid var(--line2); }
-  .lbl { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+  .sec { font-size: 15px; font-weight: 700; margin: 4px 0 10px; padding-bottom: 4px; border-bottom: 1px solid var(--line2); }
+  .lbl { display: block; font-size: 14px; font-weight: 600; margin-bottom: 4px; }
   .box { border-radius: 14px; padding: 14px; margin-bottom: 12px; border: 1px solid; }
   .box.ok { background: var(--ok-bg); border-color: var(--ok-bd); color: var(--ok); }
   .box.ng { background: var(--ng-bg); border-color: var(--ng-bd); color: var(--ng); }
   .box.warn { background: var(--warn-bg); border-color: var(--warn-bd); color: var(--warn); }
   .big { font-size: 30px; font-weight: 900; line-height: 1.2; }
-  .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 5px 0; font-size: 12px; }
-  .sub { background: var(--sub); border-radius: 12px; padding: 12px; font-size: 12px; }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 5px 0; font-size: 14px; }
+  .sub { background: var(--sub); border-radius: 12px; padding: 12px; font-size: 14px; }
   .sub .head { font-weight: 700; padding-bottom: 6px; margin-bottom: 4px; border-bottom: 1px solid var(--line); }
-  .badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+  .badge { padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; }
   .b-ok { background: var(--ok-bg); color: var(--ok); border: 1px solid var(--ok-bd); }
   .b-ng { background: var(--ng-bg); color: var(--ng); border: 1px solid var(--ng-bd); }
   .b-best { background: #34c759; color: #fff; }
@@ -53,34 +53,45 @@
   .sbtn { flex: 0 0 44px; border: 1px solid var(--input-bd); background: var(--btn); color: var(--text);
     border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; font-family: inherit; }
   .opt { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--sub);
-    padding: 11px; border-radius: 8px; border: 1px solid var(--input-bd); cursor: pointer; font-size: 12px; font-weight: 700; }
+    padding: 11px; border-radius: 8px; border: 1px solid var(--input-bd); cursor: pointer; font-size: 14px; font-weight: 700; }
   .opt input { width: 18px; height: 18px; }
   .seg { display: flex; gap: 4px; background: var(--btn); padding: 4px; border-radius: 10px; }
   .seg button { flex: 1; padding: 9px 4px; border-radius: 8px; border: 1px solid transparent; background: transparent;
-    color: var(--muted); font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    color: var(--muted); font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
   .seg button.on { background: var(--card); color: var(--accent); border-color: var(--accent); }
   .quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 6px 0 12px; }
-  .q { padding: 9px 2px; font-size: 11px; font-weight: 700; border: 1px solid var(--input-bd); border-radius: 8px;
+  .q { padding: 9px 2px; font-size: 13px; font-weight: 700; border: 1px solid var(--input-bd); border-radius: 8px;
     background: var(--btn); color: var(--text); cursor: pointer; font-family: inherit; }
   .q.m { background: var(--ng-bg); color: var(--ng); border-color: var(--ng-bd); }
   .q.wide { grid-column: span 2; background: var(--accent-bg); color: var(--accent); border-color: var(--accent); }
-  .chk { display: flex; align-items: center; gap: 8px; font-size: 12px; margin: 6px 0; }
+  .chk { display: flex; align-items: center; gap: 8px; font-size: 14px; margin: 6px 0; }
   .chk input { width: 16px; height: 16px; }
-  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
   th { color: var(--muted); font-weight: 500; padding: 4px 0; border-bottom: 1px solid var(--line); text-align: left; }
   td { padding: 6px 0; border-bottom: 1px solid var(--line2); }
   .r { text-align: right; } .c { text-align: center; }
   .pat { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 10px;
-    background: var(--card); border: 1px solid var(--line); cursor: pointer; margin-bottom: 6px; font-size: 12px; }
+    background: var(--card); border: 1px solid var(--line); cursor: pointer; margin-bottom: 6px; font-size: 14px; }
   .pat.sel { border: 1.5px solid var(--accent); background: var(--accent-bg); }
   .bar { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; margin-top: 8px; }
   .bar > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .2s; }
+  .row > :last-child { white-space: nowrap; flex: none; }
+  td.r, td.c, th.r, th.c { white-space: nowrap; }
+  .tscroll { overflow-x: auto; }
+  @media (max-width: 520px) {
+    .tscroll table { min-width: 560px; }
+    .tscroll td:first-child, .tscroll th:first-child { position: sticky; left: 0; background: #060d1c; min-width: 170px; z-index: 1; }
+    table { font-size: 12px; }
+    th { font-size: 11px; letter-spacing: 0; }
+    td, th { padding-left: 3px; padding-right: 3px; }
+    td.r, td.c, th.r, th.c { padding-left: 6px; }
+  }
   .secbtn { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .secbtn .link.reset { font-size: 12px; padding: 5px 12px; margin-bottom: 2px; white-space: nowrap; }
+  .secbtn .link.reset { font-size: 13px; padding: 5px 12px; margin-bottom: 2px; white-space: nowrap; }
   .link.reset { font-size: 14px; font-weight: 700; color: var(--ng) !important; background: var(--ng-bg); border: 1px solid var(--ng-bd); padding: 10px 18px; }
   .link.reset[data-arm="1"] { color: #fff !important; background: rgba(210, 50, 90, .75); }
   .foot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
-  .link { font-size: 11px; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; cursor: pointer; font-family: inherit; }
+  .link { font-size: 13px; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; cursor: pointer; font-family: inherit; }
   select { width: 100%; padding: 9px; border-radius: 8px; border: 1px solid var(--input-bd); background: var(--card); color: var(--text); font-weight: 600; font-size: 13px; }
 
   /* ===== FF13 ショップUI風 ===== */
@@ -122,7 +133,7 @@
   .seg button.on { color: var(--sel); border-color: transparent; background: linear-gradient(90deg, rgba(50,75,125,.85), rgba(0,0,0,.1)); }
   .opt { border: 0; border-radius: 0; background: linear-gradient(90deg, rgba(0,0,0,.65), rgba(0,0,0,.15)); }
   .link { border-radius: 0; color: #cdd8ea; }
-  th { color: #cdd8ea; letter-spacing: .12em; font-size: 10px; }
+  th { color: #cdd8ea; letter-spacing: .12em; font-size: 12px; }
   .bar { border-radius: 0; height: 6px; background: rgba(255,255,255,.18); }
   .bar > i { background: linear-gradient(90deg, #8fd0ff, #fff); }
 
@@ -142,13 +153,13 @@
   .coin { width: 18px; height: 18px; border: 2px solid #fff; border-radius: 50%; flex: none; }
   #gilNum { font-size: 20px; font-variant-numeric: tabular-nums; }
   .gilbar > div > span:not(#gilNote), #gilNum { white-space: nowrap; flex: none; }
-  @media (max-width: 520px) { #gilNum { font-size: 17px; } #gilNote { font-size: 14px; padding: 5px 9px; } #gilNote small { font-size: 11px; } }
+  @media (max-width: 520px) { #gilNum { font-size: 17px; } #gilNote { font-size: 14px; padding: 5px 9px; } #gilNote small { font-size: 12px; } }
   #gilNote { margin-left: auto; text-align: right; font-size: 16px; font-weight: 800; line-height: 1.3; color: var(--muted);
     padding: 6px 12px; border: 1px solid var(--line2); border-left-width: 5px; background: var(--sub); }
   #gilNote.ok { color: var(--ok); background: var(--ok-bg); border-color: var(--ok-bd); }
   #gilNote.warn { color: var(--warn); background: var(--warn-bg); border-color: var(--warn-bd); }
   #gilNote.ng { color: var(--ng); background: var(--ng-bg); border-color: var(--ng-bd); }
-  #gilNote small { display: block; font-size: 12px; font-weight: 600; color: var(--text); opacity: .9; }
+  #gilNote small { display: block; font-size: 13px; font-weight: 600; color: var(--text); opacity: .9; }
   #tot11, #in9tot, #out9tot, #req11 { color: #fff !important; }
   /* 教科書体: 本文・入力は標準、見出しと数値の強調だけ太字 */
   .lbl { font-weight: 400; }
@@ -157,7 +168,7 @@
   /* ===== デザイン改良 ===== */
   .box { border-left-width: 4px; transition: background .2s, border-color .2s; }
   .box.tip { padding: 10px 12px; margin-bottom: 12px; }
-  .box.tip #oil9t, #oil9t { font-size: 13px !important; }
+  .box.tip #oil9t, #oil9t { font-size: 15px !important; }
   .big { font-size: 34px; }
   .gold { color: #ffd37a; } .neg { color: var(--ng); }
   .b-warn { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-bd); }
@@ -174,14 +185,14 @@
   .meter .f.inc { left: 0; background: linear-gradient(90deg, #5aa9e6, #bfe6ff); }
   .meter .f.tal { background: repeating-linear-gradient(135deg, rgba(255,200,87,.95) 0 5px, rgba(255,200,87,.35) 5px 10px); }
   .tick { position: absolute; top: -5px; bottom: -5px; width: 2px; background: #fff; transition: left .25s; }
-  .tick span { position: absolute; top: 100%; left: 0; transform: translateX(-50%); margin-top: 5px; font-size: 11px; white-space: nowrap; color: #dbe7fa; }
+  .tick span { position: absolute; top: 100%; left: 0; transform: translateX(-50%); margin-top: 5px; font-size: 12px; white-space: nowrap; color: #dbe7fa; }
   .tick.up span { top: auto; bottom: 100%; margin: 0 0 5px; }
   .tick.end { background: var(--sel); } .tick.end span { transform: translateX(-100%); color: var(--sel); }
-  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 0 2px 14px; font-size: 11px; color: var(--muted); }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 0 2px 14px; font-size: 13px; color: var(--muted); }
   .sw { display: inline-block; width: 12px; height: 8px; margin-right: 5px; vertical-align: 0; }
   .sw.inc { background: linear-gradient(90deg, #5aa9e6, #bfe6ff); }
   .sw.tal { background: repeating-linear-gradient(135deg, rgba(255,200,87,.95) 0 3px, rgba(255,200,87,.35) 3px 6px); }
-  details.fold summary { cursor: pointer; color: var(--accent); font-size: 12px; padding: 8px 0; list-style: none; }
+  details.fold summary { cursor: pointer; color: var(--accent); font-size: 14px; padding: 8px 0; list-style: none; }
   details.fold summary::before { content: "▸ "; } details.fold[open] summary::before { content: "▾ "; }
   details.fold summary::-webkit-details-marker { display: none; }
   .pat { transition: filter .12s, transform .12s; } .pat:hover { filter: brightness(1.08); }
@@ -255,7 +266,7 @@
             <div class="stepper"><button class="sbtn" data-add="phoenix:-1">−</button><input type="number" inputmode="numeric" data-bind="phoenix" min="0"><button class="sbtn" data-add="phoenix:1">＋</button></div></div>
           <div><span class="lbl">売却数 (@500G・最低2個は残す)</span>
             <div class="stepper"><button class="sbtn" data-add="phoenixSell:-1">−</button><input type="number" inputmode="numeric" data-bind="phoenixSell" min="0"><button class="sbtn" data-add="phoenixSell:1">＋</button></div>
-            <div class="stepper" style="margin-top:6px;"><button class="sbtn" data-phneed="1" style="flex:1 1 0;font-size:12px;">必要数</button><button class="sbtn" data-phmax="1" style="flex:1 1 0;font-size:12px;">最大</button></div></div>
+            <div class="stepper" style="margin-top:6px;"><button class="sbtn" data-phneed="1" style="flex:1 1 0;font-size:13px;">必要数</button><button class="sbtn" data-phmax="1" style="flex:1 1 0;font-size:12px;">最大</button></div></div>
         </div>
         <div id="phHint" class="note" style="margin-bottom:8px;"></div>
         <div class="note" style="margin-bottom:4px;">フェニックスの尾を回収した場合 (通常は回収しない・チェックで所持数に反映)</div>
@@ -284,7 +295,7 @@
 
     <div class="card resultcol">
       <div id="st9" class="box ng" style="margin-top:12px;">
-        <div class="row" style="margin:0 0 4px;"><b id="st9sub" style="font-size:12px;"></b><span id="st9badge" class="badge"></span></div>
+        <div class="row" style="margin:0 0 4px;"><b id="st9sub" style="font-size:14px;"></b><span id="st9badge" class="badge"></span></div>
         <div id="st9main" class="big"></div>
         <div id="st9next" class="note" style="margin-top:6px;color:inherit;opacity:.85;"></div>
       </div>
@@ -293,7 +304,7 @@
 
       <div id="oil9" class="box warn tip">
         <div id="oil9t" style="font-weight:800;font-size:14px;margin-bottom:2px;"></div>
-        <div id="oil9s" style="font-size:11px;line-height:1.6;"></div>
+        <div id="oil9s" style="font-size:13px;line-height:1.6;"></div>
       </div>
 
       <div id="plan9"></div>
@@ -324,10 +335,12 @@
         レアドロップ(プレミアムチップ)を先に判定し、外れたら通常ドロップ(フェニ尾・クレジット)を判定する前提です。1体から出るのは1個までです。<br>
         7章: 4体+3体 (レア10% / 通常10%) ／ 9章: 3体+3体 (レア25% / 通常25%)。9章のクレジットは、9章のプレミアムと同じ2戦と仮定しています。
       </div>
+      <div class="tscroll">
       <table>
         <thead><tr><th>アイテム</th><th class="r">期待値</th><th class="r">0個</th><th class="r">1個以上</th><th class="r">2個以上</th><th class="r">3個以上</th><th class="r">4個以上</th></tr></thead>
         <tbody id="dropTb"></tbody>
       </table>
+      </div>
     </div>
   </div>
 
@@ -378,7 +391,7 @@
         <div id="title11" style="font-size:24px;font-weight:800;color:var(--accent);margin-bottom:8px;"></div>
         <div id="box11" class="box ok" style="padding:12px;">
           <div id="box11t" style="font-weight:700;margin-bottom:2px;"></div>
-          <div id="box11s" style="font-size:11px;"></div>
+          <div id="box11s" style="font-size:13px;"></div>
           <div class="bar"><i id="bar11"></i></div>
         </div>
         <div class="sec">購入リスト</div>
@@ -405,10 +418,12 @@
         ブリッジ1 = PSICOM強襲猟兵×3 + PSICOM特化強襲兵、ブリッジ2 = PSICOM機動コマンド×2 + PSICOM特化強襲兵 + PSICOM戦術導士。<br>
         レアドロップは5倍判定 (基本5% → 25%)、通常ドロップは25%のまま。レア判定が外れたら通常判定を行います。強襲猟兵・特化強襲兵・機動コマンドは レア=プレミアムチップ / 通常=クレジットチップ、戦術導士は レア=輝コバルト鉱 / 通常=クレジットチップです (ドロップ品・各率ともバトルアルティマニア参照)。
       </div>
+      <div class="tscroll">
       <table>
         <thead><tr><th>アイテム</th><th class="r">期待値</th><th class="r">0個</th><th class="r">1個以上</th><th class="r">2個以上</th><th class="r">3個以上</th><th class="r">4個以上</th></tr></thead>
         <tbody id="dropTb11"></tbody>
       </table>
+      </div>
       <div class="sec" style="margin-top:16px;">各チャートに届くために必要なドロップ</div>
       <div class="note" style="margin-bottom:8px;line-height:1.6;">
         いまの合計所持ギル (入力済みのドロップ込み) に、ブリッジ1・2のドロップを足して届く確率です。ブリッジ戦闘後は、実際のドロップを上の入力欄に入れてください (この表は戦闘前の目安です)。
