@@ -140,18 +140,19 @@
   /* 金属グレーの一覧行 (ITEM / PRICE) */
   .pat { position: relative; border: 0; border-radius: 0; margin-bottom: 2px; padding: 9px 12px 9px 34px; color: #fff;
     background: linear-gradient(100deg, #dedede 0%, #909090 52%, #000 52.4%, #000 100%); }
-  .pat > div:first-child { flex: 0 0 50%; color: #121212; }
+  .pat { --split: 62%; }
+  .pat > div:first-child { flex: 0 0 60%; color: #121212; }
   .pat > div:first-child .note { color: #3a3a3a; }
-  .pat.sel { background: linear-gradient(100deg, #ffffff 0%, #bcd0ee 52%, #000 52.4%, #000 100%); box-shadow: 0 0 0 1px #fff; }
+  .pat.sel { background: linear-gradient(100deg, #ffffff 0%, #bcd0ee var(--split), #000 calc(var(--split) + .4%), #000 100%); box-shadow: 0 0 0 1px #fff; }
   /* 状態の色: 最高到達=金 / 届く=緑 / 惜しい(あと3,000G以内)=黄 / 遠い=赤 */
-  .pat.st-best { background: linear-gradient(100deg, #f6dd8c 0%, #c79a2e 52%, #000 52.4%, #000 100%); }
-  .pat.st-ok   { background: linear-gradient(100deg, #b9ecd6 0%, #45a07f 52%, #000 52.4%, #000 100%); }
-  .pat.st-near { background: linear-gradient(100deg, #f0e2a0 0%, #b89a3e 52%, #000 52.4%, #000 100%); }
-  .pat.st-far  { background: linear-gradient(100deg, #e9bcc7 0%, #a5576c 52%, #000 52.4%, #000 100%); }
-  .pat.sel.st-best { background: linear-gradient(100deg, #fff3c4 0%, #ecc65a 52%, #000 52.4%, #000 100%); }
-  .pat.sel.st-ok   { background: linear-gradient(100deg, #eafff6 0%, #86d6b6 52%, #000 52.4%, #000 100%); }
-  .pat.sel.st-near { background: linear-gradient(100deg, #fff8d6 0%, #dcc468 52%, #000 52.4%, #000 100%); }
-  .pat.sel.st-far  { background: linear-gradient(100deg, #ffe6ec 0%, #dc8ea4 52%, #000 52.4%, #000 100%); }
+  .pat.st-best { background: linear-gradient(100deg, #f6dd8c 0%, #c79a2e var(--split), #000 calc(var(--split) + .4%), #000 100%); }
+  .pat.st-ok   { background: linear-gradient(100deg, #b9ecd6 0%, #45a07f var(--split), #000 calc(var(--split) + .4%), #000 100%); }
+  .pat.st-near { background: linear-gradient(100deg, #f0e2a0 0%, #b89a3e var(--split), #000 calc(var(--split) + .4%), #000 100%); }
+  .pat.st-far  { background: linear-gradient(100deg, #e9bcc7 0%, #a5576c var(--split), #000 calc(var(--split) + .4%), #000 100%); }
+  .pat.sel.st-best { background: linear-gradient(100deg, #fff3c4 0%, #ecc65a var(--split), #000 calc(var(--split) + .4%), #000 100%); }
+  .pat.sel.st-ok   { background: linear-gradient(100deg, #eafff6 0%, #86d6b6 var(--split), #000 calc(var(--split) + .4%), #000 100%); }
+  .pat.sel.st-near { background: linear-gradient(100deg, #fff8d6 0%, #dcc468 var(--split), #000 calc(var(--split) + .4%), #000 100%); }
+  .pat.sel.st-far  { background: linear-gradient(100deg, #ffe6ec 0%, #dc8ea4 var(--split), #000 calc(var(--split) + .4%), #000 100%); }
   .pat.sel::before { content: "☞"; position: absolute; left: 8px; top: 50%; transform: translateY(-52%); font-size: 19px; color: #fff; text-shadow: 0 0 2px #000, 0 0 2px #000, 0 0 3px #000; }
   .pat > div:last-child { flex: 1; justify-content: flex-end; }
 
@@ -216,7 +217,7 @@
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
   input[data-bind="base9"] { font-weight: 700; }
   .pat b { white-space: nowrap; }
-  @media (max-width: 480px) { .pat > div:first-child { flex: 0 0 40%; } .pat > div:first-child .note { display: block; } .pat { padding-left: 30px; } }
+  @media (max-width: 480px) { .pat { --split: 52%; } .pat > div:first-child { flex: 0 0 40%; } .pat > div:first-child .note { display: block; } .pat { padding-left: 30px; } }
   details.fold.need summary { color: var(--warn); font-weight: 700; }
   .split { display: block; }
   .resultcol > :first-child { margin-top: 0 !important; }
