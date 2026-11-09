@@ -515,7 +515,7 @@
     // 売っても魔神のタリスマン売却 (2回目の買い物) になる場合は考慮しない。
     var res0 = ev(0), tailsNeeded = res0.stage === 'A', short0 = must - res0.income;
     var res = ev(S.phoenixSell), ignored = false;
-    if (S.phoenixSell > 0 && res.stage === 'C' && res0.stage === 'C') { res = res0; ignored = true; }
+    if (S.phoenixSell > 0 && ((res.stage === 'C' && res0.stage === 'C') || res0.stage === 'B')) { res = res0; ignored = true; } // 2回目の買い物になる場合と、売らなくても足りる場合は、売却を反映しない
     var income = res.income, diff = res.diff, stage = res.stage;
     var L = income - must, first = [], second = [];
     if (S.set) {
@@ -562,6 +562,7 @@
       var csA = Math.max(0, phOwned() - KEEP), rmA = csA - r.sellEff, ndA = Math.ceil((r.must - r.income) / 500);
       next = ndA <= rmA ? '→ フェニックスの尾をあと ' + ndA + ' 個売れば①に届きます'
         : rmA > 0 ? '→ フェニ尾を全て売っても①に届きません'
+        : r.sellEff > 0 ? '→ フェニ尾を ' + r.sellEff + ' 個売却中でも①に届きません'
         : '→ 売れるフェニ尾がなく、①に届きません';
       next += ' / 11章へは ' + sfmt(r.leftover) + ' で持ち越し';
     } else if (st === 'B') {
@@ -615,7 +616,7 @@
     var needSet = Math.ceil(Math.max(0, r.shortSet) / 500);
     var setTxt = needSet <= canSell ? 'あと合計 ' + needSet + ' 個売ると①②とも1回目で買えます' : '全て売っても②には届きません';
     if (r.stage0 === 'B') {
-      hint9 = '①②とも届くので、フェニ尾は売却しません (売却可能 ' + canSell + ' 個)。';
+      hint9 = '①②とも届くので、フェニ尾は売却しません (売却可能 ' + canSell + ' 個)。' + (S.phoenixSell > 0 ? ' ※ 入力の売却数 (' + S.phoenixSell + ' 個) は反映していません。' : '');
     } else if (r.tailIgnored) {
       hint9 = '※ 2回目の買い物(タリスマン売却)になるため、フェニ尾の売却 (' + S.phoenixSell + ' 個) は反映していません。' + (owned > 0 ? ' 売却可能 ' + canSell + ' 個。' + setTxt + '。' : '');
     } else if (r.stage0 === 'A') {
