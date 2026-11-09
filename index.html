@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FF13 買い物分岐</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #02060f; --card: rgba(0, 0, 0, .38); --sub: rgba(0, 0, 0, .40); --line: rgba(255, 255, 255, .38); --line2: rgba(255, 255, 255, .16);
+    --text: #ffffff; --muted: #9fb8da; --accent: #8fd0ff; --accent-bg: rgba(143, 208, 255, .16);
+    --ok-bg: rgba(40, 170, 120, .22); --ok-bd: rgba(120, 255, 200, .5); --ok: #93ffcb;
+    --ng-bg: rgba(190, 45, 80, .26); --ng-bd: rgba(255, 130, 160, .55); --ng: #ff9db0;
+    --warn-bg: rgba(200, 150, 30, .22); --warn-bd: rgba(255, 215, 120, .55); --warn: #ffd98a;
+    --btn: rgba(255, 255, 255, .10); --input-bd: rgba(255, 255, 255, .38); --tab-off: rgba(0, 0, 0, .4);
+    --sel: #ffc14d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 12px; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", Roboto, sans-serif; }
+  .app { max-width: 860px; margin: 0 auto; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 12px; position: sticky; top: 0; z-index: 5; padding: 4px 0; background: var(--bg); }
+  .tab { flex: 1; padding: 12px 8px; font-size: 14px; font-weight: 700; border-radius: 12px; border: 1px solid var(--input-bd);
+    background: var(--tab-off); color: var(--muted); cursor: pointer; font-family: inherit; }
+  .tab.on { background: var(--card); color: var(--accent); border-color: var(--accent); }
+  .pane { display: none; } .pane.on { display: block; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+  h1 { margin: 0 0 4px; font-size: 18px; }
+  .note { font-size: 11px; color: var(--muted); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+  .sec { font-size: 13px; font-weight: 700; margin: 4px 0 10px; padding-bottom: 4px; border-bottom: 1px solid var(--line2); }
+  .lbl { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+  .box { border-radius: 14px; padding: 14px; margin-bottom: 12px; border: 1px solid; }
+  .box.ok { background: var(--ok-bg); border-color: var(--ok-bd); color: var(--ok); }
+  .box.ng { background: var(--ng-bg); border-color: var(--ng-bd); color: var(--ng); }
+  .box.warn { background: var(--warn-bg); border-color: var(--warn-bd); color: var(--warn); }
+  .big { font-size: 30px; font-weight: 900; line-height: 1.2; }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 5px 0; font-size: 12px; }
+  .sub { background: var(--sub); border-radius: 12px; padding: 12px; font-size: 12px; }
+  .sub .head { font-weight: 700; padding-bottom: 6px; margin-bottom: 4px; border-bottom: 1px solid var(--line); }
+  .badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+  .b-ok { background: var(--ok-bg); color: var(--ok); border: 1px solid var(--ok-bd); }
+  .b-ng { background: var(--ng-bg); color: var(--ng); border: 1px solid var(--ng-bd); }
+  .b-best { background: #34c759; color: #fff; }
+  .tag { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 6px; margin-right: 4px; }
+  .t-fix { background: var(--line); color: var(--muted); } .t-opt { background: var(--accent-bg); color: var(--accent); }
+  .off { opacity: .4; text-decoration: line-through; }
+  input[type=number] { width: 100%; padding: 9px 10px; font-size: 16px; font-weight: 700; border: 1px solid var(--input-bd);
+    border-radius: 8px; background: var(--card); color: var(--text); font-family: inherit; }
+  .stepper { display: flex; gap: 6px; }
+  .stepper input { text-align: center; }
+  .sbtn { flex: 0 0 44px; border: 1px solid var(--input-bd); background: var(--btn); color: var(--text);
+    border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .opt { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--sub);
+    padding: 11px; border-radius: 8px; border: 1px solid var(--input-bd); cursor: pointer; font-size: 12px; font-weight: 700; }
+  .opt input { width: 18px; height: 18px; }
+  .seg { display: flex; gap: 4px; background: var(--btn); padding: 4px; border-radius: 10px; }
+  .seg button { flex: 1; padding: 9px 4px; border-radius: 8px; border: 1px solid transparent; background: transparent;
+    color: var(--muted); font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .seg button.on { background: var(--card); color: var(--accent); border-color: var(--accent); }
+  .quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 6px 0 12px; }
+  .q { padding: 9px 2px; font-size: 11px; font-weight: 700; border: 1px solid var(--input-bd); border-radius: 8px;
+    background: var(--btn); color: var(--text); cursor: pointer; font-family: inherit; }
+  .q.m { background: var(--ng-bg); color: var(--ng); border-color: var(--ng-bd); }
+  .q.wide { grid-column: span 2; background: var(--accent-bg); color: var(--accent); border-color: var(--accent); }
+  .chk { display: flex; align-items: center; gap: 8px; font-size: 12px; margin: 6px 0; }
+  .chk input { width: 16px; height: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { color: var(--muted); font-weight: 500; padding: 4px 0; border-bottom: 1px solid var(--line); text-align: left; }
+  td { padding: 6px 0; border-bottom: 1px solid var(--line2); }
+  .r { text-align: right; } .c { text-align: center; }
+  .pat { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 10px;
+    background: var(--card); border: 1px solid var(--line); cursor: pointer; margin-bottom: 6px; font-size: 12px; }
+  .pat.sel { border: 1.5px solid var(--accent); background: var(--accent-bg); }
+  .bar { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; margin-top: 8px; }
+  .bar > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .2s; }
+  .secbtn { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .secbtn .link.reset { font-size: 12px; padding: 5px 12px; margin-bottom: 2px; white-space: nowrap; }
+  .link.reset { font-size: 14px; font-weight: 700; color: var(--ng) !important; background: var(--ng-bg); border: 1px solid var(--ng-bd); padding: 10px 18px; }
+  .link.reset[data-arm="1"] { color: #fff !important; background: rgba(210, 50, 90, .75); }
+  .foot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+  .link { font-size: 11px; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; cursor: pointer; font-family: inherit; }
+  select { width: 100%; padding: 9px; border-radius: 8px; border: 1px solid var(--input-bd); background: var(--card); color: var(--text); font-weight: 600; font-size: 13px; }
+
+  /* ===== FF13 ショップUI風 ===== */
+  html { background: #02060f; }
+  button, input, select { font-family: inherit; }
+  body { min-height: 100vh; padding-bottom: 84px;
+    font-family: "UD デジタル 教科書体 NK", "UD Digital Kyokasho NK", "UD デジタル 教科書体 NK-R", "UD Digital Kyokasho NK-R", "UD デジタル 教科書体 N-R", "Noto Sans JP", "Hiragino Sans", "Yu Gothic UI", sans-serif; letter-spacing: .02em;
+    background:
+      repeating-linear-gradient(115deg, rgba(70, 120, 210, .06) 0 2px, transparent 2px 52px),
+      radial-gradient(55% 45% at 80% 35%, rgba(40, 115, 235, .40), transparent 72%),
+      linear-gradient(#030a1c, #020611) fixed; }
+  .helpbar { display: flex; align-items: center; gap: 14px; padding: 4px 2px 8px; margin-bottom: 12px;
+    border-bottom: 2px solid #fff; font-size: 14px; }
+  .helplogo { font: italic 900 17px/1 Georgia, serif; letter-spacing: 0; padding: 3px 8px; background: linear-gradient(#fff, #8d8d8d); color: #111; clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
+  .tabs { background: linear-gradient(#030a1c 70%, transparent); padding-bottom: 10px; }
+  .tab { position: relative; text-align: left; padding: 11px 8px 11px 36px; border: 0; border-radius: 0; clip-path: none;
+    background: linear-gradient(90deg, rgba(0,0,0,.65), rgba(0,0,0,.12)); color: #cdd8ea; letter-spacing: .08em; }
+  .tab.on { color: var(--sel); background: linear-gradient(90deg, rgba(50,75,125,.85), rgba(0,0,0,.1)); box-shadow: none; border: 0; }
+  .tab.on::before, .seg button.on::before { content: "☞"; position: absolute; left: 10px; top: 50%; transform: translateY(-52%); font-size: 19px; color: #fff; text-shadow: 0 0 2px #000, 0 0 2px #000; }
+  .card { border: 0; border-top: 1px solid rgba(255,255,255,.6); border-bottom: 1px solid rgba(255,255,255,.2); border-radius: 0;
+    box-shadow: none; background: var(--card); backdrop-filter: blur(3px); }
+  h1 { font-size: 17px; letter-spacing: .1em; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .sec { color: #fff; letter-spacing: .1em; border-bottom: 1px solid var(--line); }
+  .sub { border: 0; border-radius: 0; background: rgba(0,0,0,.42); }
+  .sub .head { color: #fff; border-bottom: 1px solid var(--line); }
+  .box { border-radius: 0; }
+  .big { font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+  .badge { border-radius: 2px; letter-spacing: .06em; }
+  .b-best { background: linear-gradient(#ffe9a0, #d1a73c); color: #2a1d00; }
+  input[type=number], select { border-radius: 0; background: rgba(0,0,0,.6); border: 1px solid var(--input-bd); font-variant-numeric: tabular-nums; color: #fff; }
+  input[type=number]:focus, select:focus { outline: none; border-color: var(--sel); box-shadow: 0 0 0 1px var(--sel); }
+  select option { background: #0a1630; color: #fff; }
+  .sbtn, .q { border: 0; border-radius: 0; background: linear-gradient(#ececec, #9c9c9c); color: #111; }
+  .q.m { background: linear-gradient(#f0c0c8, #a8626f); color: #2a0008; }
+  .q.wide { background: linear-gradient(#fff3c8, #d1a73c); color: #2a1d00; }
+  .sbtn:active, .q:active { filter: brightness(1.25); }
+  .seg { border-radius: 0; background: transparent; padding: 0; gap: 2px; }
+  .seg button { position: relative; border-radius: 0; padding: 10px 6px 10px 30px; text-align: left; color: #cdd8ea; background: linear-gradient(90deg, rgba(0,0,0,.65), rgba(0,0,0,.12)); }
+  .seg button.on { color: var(--sel); border-color: transparent; background: linear-gradient(90deg, rgba(50,75,125,.85), rgba(0,0,0,.1)); }
+  .opt { border: 0; border-radius: 0; background: linear-gradient(90deg, rgba(0,0,0,.65), rgba(0,0,0,.15)); }
+  .link { border-radius: 0; color: #cdd8ea; }
+  th { color: #cdd8ea; letter-spacing: .12em; font-size: 10px; }
+  .bar { border-radius: 0; height: 6px; background: rgba(255,255,255,.18); }
+  .bar > i { background: linear-gradient(90deg, #8fd0ff, #fff); }
+
+  /* 金属グレーの一覧行 (ITEM / PRICE) */
+  .pat { position: relative; border: 0; border-radius: 0; margin-bottom: 2px; padding: 9px 12px 9px 34px; color: #fff;
+    background: linear-gradient(100deg, #dedede 0%, #909090 52%, #000 52.4%, #000 100%); }
+  .pat > div:first-child { flex: 0 0 50%; color: #121212; }
+  .pat > div:first-child .note { color: #3a3a3a; }
+  .pat.sel { background: linear-gradient(100deg, #ffffff 0%, #bcd0ee 52%, #000 52.4%, #000 100%); box-shadow: 0 0 0 1px #fff; }
+  .pat.sel::before { content: "☞"; position: absolute; left: 8px; top: 50%; transform: translateY(-52%); font-size: 19px; color: #fff; text-shadow: 0 0 2px #000, 0 0 2px #000, 0 0 3px #000; }
+  .pat > div:last-child { flex: 1; justify-content: flex-end; }
+
+  /* 下部の所持ギル */
+  .gilbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 9; padding: 10px 14px 12px; border-top: 2px solid #fff;
+    background: linear-gradient(rgba(2,6,17,.82), rgba(2,6,17,.96)); }
+  .gilbar > div { max-width: 860px; margin: 0 auto; display: flex; align-items: center; gap: 10px; }
+  .coin { width: 18px; height: 18px; border: 2px solid #fff; border-radius: 50%; flex: none; }
+  #gilNum { font-size: 20px; font-variant-numeric: tabular-nums; }
+  .gilbar > div > span:not(#gilNote), #gilNum { white-space: nowrap; flex: none; }
+  @media (max-width: 520px) { #gilNum { font-size: 17px; } #gilNote { font-size: 14px; padding: 5px 9px; } #gilNote small { font-size: 11px; } }
+  #gilNote { margin-left: auto; text-align: right; font-size: 16px; font-weight: 800; line-height: 1.3; color: var(--muted);
+    padding: 6px 12px; border: 1px solid var(--line2); border-left-width: 5px; background: var(--sub); }
+  #gilNote.ok { color: var(--ok); background: var(--ok-bg); border-color: var(--ok-bd); }
+  #gilNote.warn { color: var(--warn); background: var(--warn-bg); border-color: var(--warn-bd); }
+  #gilNote.ng { color: var(--ng); background: var(--ng-bg); border-color: var(--ng-bd); }
+  #gilNote small { display: block; font-size: 12px; font-weight: 600; color: var(--text); opacity: .9; }
+  #tot11, #in9tot, #out9tot, #req11 { color: #fff !important; }
+  /* 教科書体: 本文・入力は標準、見出しと数値の強調だけ太字 */
+  .lbl { font-weight: 400; }
+  input[type=number], select { font-weight: 400; }
+
+  /* ===== デザイン改良 ===== */
+  .box { border-left-width: 4px; transition: background .2s, border-color .2s; }
+  .box.tip { padding: 10px 12px; margin-bottom: 12px; }
+  .box.tip #oil9t, #oil9t { font-size: 13px !important; }
+  .big { font-size: 34px; }
+  .gold { color: #ffd37a; } .neg { color: var(--ng); }
+  .b-warn { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-bd); }
+  .b-mute { background: rgba(255,255,255,.08); color: var(--muted); border: 1px solid var(--line2); }
+  .steps { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  @media (max-width: 640px) { .steps { grid-template-columns: 1fr; } }
+  .step { background: rgba(0,0,0,.42); border-left: 4px solid var(--line); padding: 12px; }
+  .step.ok { border-left-color: var(--ok); } .step.warn { border-left-color: var(--warn); } .step.ng { border-left-color: var(--ng); }
+  .step.mute { opacity: .55; }
+  .step-h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 14px; }
+  .step .tot { border-top: 1px solid var(--line2); padding-top: 6px; margin-top: 6px; }
+  .meter { position: relative; height: 14px; background: rgba(255,255,255,.12); margin: 30px 2px 40px; }
+  .meter .f { position: absolute; top: 0; bottom: 0; transition: width .25s, left .25s; }
+  .meter .f.inc { left: 0; background: linear-gradient(90deg, #5aa9e6, #bfe6ff); }
+  .meter .f.tal { background: repeating-linear-gradient(135deg, rgba(255,200,87,.95) 0 5px, rgba(255,200,87,.35) 5px 10px); }
+  .tick { position: absolute; top: -5px; bottom: -5px; width: 2px; background: #fff; transition: left .25s; }
+  .tick span { position: absolute; top: 100%; left: 0; transform: translateX(-50%); margin-top: 5px; font-size: 11px; white-space: nowrap; color: #dbe7fa; }
+  .tick.up span { top: auto; bottom: 100%; margin: 0 0 5px; }
+  .tick.end { background: var(--sel); } .tick.end span { transform: translateX(-100%); color: var(--sel); }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 0 2px 14px; font-size: 11px; color: var(--muted); }
+  .sw { display: inline-block; width: 12px; height: 8px; margin-right: 5px; vertical-align: 0; }
+  .sw.inc { background: linear-gradient(90deg, #5aa9e6, #bfe6ff); }
+  .sw.tal { background: repeating-linear-gradient(135deg, rgba(255,200,87,.95) 0 3px, rgba(255,200,87,.35) 3px 6px); }
+  details.fold summary { cursor: pointer; color: var(--accent); font-size: 12px; padding: 8px 0; list-style: none; }
+  details.fold summary::before { content: "▸ "; } details.fold[open] summary::before { content: "▾ "; }
+  details.fold summary::-webkit-details-marker { display: none; }
+  .pat { transition: filter .12s, transform .12s; } .pat:hover { filter: brightness(1.08); }
+  .tab:hover:not(.on), .seg button:hover:not(.on), .opt:hover { filter: brightness(1.25); }
+  button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid var(--sel); outline-offset: 2px; }
+  .card { margin-bottom: 14px; }
+  @media (max-width: 480px) { body { padding: 8px; } .card { padding: 12px; } .big { font-size: 30px; } .tab { font-size: 13px; padding-left: 30px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  input[data-bind="base9"] { font-weight: 700; }
+  .pat b { white-space: nowrap; }
+  @media (max-width: 480px) { .pat > div:first-child { flex: 0 0 40%; } .pat > div:first-child .note { display: block; } .pat { padding-left: 30px; } }
+  details.fold.need summary { color: var(--warn); font-weight: 700; }
+  .split { display: block; }
+  .resultcol > :first-child { margin-top: 0 !important; }
+  @media (min-width: 980px) {
+    .app { max-width: 1200px; }
+    .gilbar > div { max-width: 1200px; }
+    .split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 14px; align-items: start; margin-bottom: 14px; }
+    .split > .card { margin-bottom: 0; }
+    .resultcol { position: sticky; top: 72px; max-height: calc(100vh - 150px); overflow-y: auto; scrollbar-width: thin; }
+  }
+  .col11 { min-width: 0; }
+  @media (min-width: 980px) {
+    .split11 { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: start; }
+    .col11 { position: sticky; top: 72px; max-height: calc(100vh - 150px); overflow-y: auto; scrollbar-width: thin; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="helpbar"><span class="helplogo">HELP</span><span id="helpText"></span></div>
+  <div class="tabs">
+    <button class="tab on" data-tab="9">9章</button>
+    <button class="tab" data-tab="11">11章</button>
+  </div>
+
+  <!-- ========== 9章 ========== -->
+  <div id="pane9" class="pane on">
+    <div class="split">
+    <div class="card">
+      <h1>9章 買い物・オイル回収分岐</h1>
+      <div class="note">確定売却額 20,275 Gil ベース</div>
+
+      <div style="margin-top:12px;">
+        <span class="lbl">所持ギル (ゲーム画面の所持金・7章 買い物終了時は最低 5,000G)</span>
+        <input type="number" inputmode="numeric" data-bind="base9" step="10" min="0" style="font-size:24px;padding:10px 12px;">
+        <div class="quick" style="margin-bottom:0;">
+          <button class="q" data-add="base9:100">+100</button>
+          <button class="q" data-add="base9:500">+500</button>
+          <button class="q" data-add="base9:1000">+1,000</button>
+          <button class="q" data-add="base9:5000">+5,000</button>
+          <button class="q m" data-add="base9:-100">−100</button>
+          <button class="q m" data-add="base9:-500">−500</button>
+          <button class="q m" data-add="base9:-1000">−1,000</button>
+          <button class="q" data-set="base9:5000">5,000に戻す</button>
+        </div>
+      </div>
+
+      <div class="sec secbtn" style="margin-top:16px;"><span>ドロップ</span><button class="link reset" data-reset="1">全部リセット</button></div>
+      <div class="grid" style="margin-bottom:4px;">
+        <div><span class="lbl">クレジットチップ (@500G)</span>
+          <div class="stepper"><button class="sbtn" data-add="cred:-1">−</button><input type="number" inputmode="numeric" data-bind="cred" min="0" max="6"><button class="sbtn" data-add="cred:1">＋</button><button class="sbtn" data-set="cred:0" style="font-size:12px;" title="0個にする">0</button></div></div>
+        <div><span class="lbl">プレミアムチップ (@2,500G)</span>
+          <div class="stepper"><button class="sbtn" data-add="prem:-1">−</button><input type="number" inputmode="numeric" data-bind="prem" min="0" max="13"><button class="sbtn" data-add="prem:1">＋</button><button class="sbtn" data-set="prem:0" style="font-size:12px;" title="0個にする">0</button></div></div>
+      </div>
+      <label class="opt" style="margin:6px 0 4px;"><span>シリコンオイル回収 (+1,320G)</span><input type="checkbox" data-chk="oil"></label>
+      <details class="fold" id="phFold"><summary id="phSum"></summary>
+        <div class="note" id="phNote" style="margin:2px 0 8px;">フェニックスの尾の売却は、足りないときだけ使う手段です。通常は売却数を0のままにしてください。</div>
+        <div class="grid" style="margin-bottom:4px;">
+          <div><span class="lbl">フェニックスの尾 所持数</span>
+            <div class="stepper"><button class="sbtn" data-add="phoenix:-1">−</button><input type="number" inputmode="numeric" data-bind="phoenix" min="0"><button class="sbtn" data-add="phoenix:1">＋</button></div></div>
+          <div><span class="lbl">売却数 (@500G・最低2個は残す)</span>
+            <div class="stepper"><button class="sbtn" data-add="phoenixSell:-1">−</button><input type="number" inputmode="numeric" data-bind="phoenixSell" min="0"><button class="sbtn" data-add="phoenixSell:1">＋</button></div>
+            <div class="stepper" style="margin-top:6px;"><button class="sbtn" data-phneed="1" style="flex:1 1 0;font-size:12px;">必要数</button><button class="sbtn" data-phmax="1" style="flex:1 1 0;font-size:12px;">最大</button></div></div>
+        </div>
+        <div id="phHint" class="note" style="margin-bottom:8px;"></div>
+        <div class="note" style="margin-bottom:4px;">フェニックスの尾を回収した場合 (通常は回収しない・チェックで所持数に反映)</div>
+        <div class="grid" style="margin-bottom:0;">
+          <label class="opt"><span>7章 買い物終わりに1個回収 (所持数 +1)</span><input type="checkbox" data-chk="ph7a"></label>
+          <label class="opt"><span>9章 買い物前に1個回収 (所持数 +1)</span><input type="checkbox" data-chk="ph9a"></label>
+        </div>
+      </details>
+
+      <div class="sec" style="margin-top:16px;">購入設定</div>
+      <div class="grid" style="margin-bottom:12px;">
+        <div>
+          <span class="lbl">生体素材 (どちらか固定)</span>
+          <div class="seg" id="bioSeg">
+            <button data-bio="hone">骨37 (2,960G)</button>
+            <button data-bio="kiba">牙39 (3,120G)</button>
+          </div>
+        </div>
+        <div>
+          <span class="lbl">&nbsp;</span>
+          <div class="note" style="padding:10px 0;">② セット (シャーマンサイン x1 + ポーション x31 = 4,550G) は常に購入前提です。①のあとに買えれば1回目、買えなければ2回目で判定します。</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card resultcol">
+      <div id="st9" class="box ng" style="margin-top:12px;">
+        <div class="row" style="margin:0 0 4px;"><b id="st9sub" style="font-size:12px;"></b><span id="st9badge" class="badge"></span></div>
+        <div id="st9main" class="big"></div>
+        <div id="st9next" class="note" style="margin-top:6px;color:inherit;opacity:.85;"></div>
+      </div>
+
+      <div id="meter9"></div>
+
+      <div id="oil9" class="box warn tip">
+        <div id="oil9t" style="font-weight:800;font-size:14px;margin-bottom:2px;"></div>
+        <div id="oil9s" style="font-size:11px;line-height:1.6;"></div>
+      </div>
+
+      <div id="plan9"></div>
+
+      <details class="fold"><summary>所持金・購入必要額の内訳を見る</summary>
+      <div class="grid" style="margin-top:8px;">
+        <div class="sub">
+          <div class="row head"><span>所持金・売却額</span><span id="in9tot"></span></div>
+          <div class="row"><b>確定売却 (固定)</b><b>20,275 Gil</b></div>
+          <div class="row"><span>シリコンオイルx4</span><span id="in9oil"></span></div>
+          <div class="row"><span>所持ギル</span><span id="in9base"></span></div>
+          <div class="row"><span>チップ・フェニ尾売却</span><span id="in9drop"></span></div>
+        </div>
+        <div class="sub">
+          <div class="row head"><span>購入必要額</span><span id="out9tot"></span></div>
+          <div class="row"><span><span class="tag t-fix">①</span>クランク軸x32</span><span>26,880 Gil</span></div>
+          <div class="row"><span><span class="tag t-fix">①</span><span id="out9bioN"></span></span><span id="out9bioC"></span></div>
+          <div class="row" id="row9set"><span><span class="tag t-opt">②</span>シャーマンサインx1 + ポーションx31 (セット)</span><span id="out9set"></span></div>
+        </div>
+      </div>
+      </details>
+    </div>
+    </div>
+
+    <div class="card">
+      <div class="sec">ドロップ確率 (参考)</div>
+      <div class="note" style="margin-bottom:8px;line-height:1.6;">
+        レアドロップ(プレミアムチップ)を先に判定し、外れたら通常ドロップ(フェニ尾・クレジット)を判定する前提です。1体から出るのは1個までです。<br>
+        7章: 4体+3体 (レア10% / 通常10%) ／ 9章: 3体+3体 (レア25% / 通常25%)。9章のクレジットは、9章のプレミアムと同じ2戦と仮定しています。
+      </div>
+      <table>
+        <thead><tr><th>アイテム</th><th class="r">期待値</th><th class="r">0個</th><th class="r">1個以上</th><th class="r">2個以上</th><th class="r">3個以上</th><th class="r">4個以上</th></tr></thead>
+        <tbody id="dropTb"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ========== 11章 ========== -->
+  <div id="pane11" class="pane">
+    <div class="card">
+      <h1>11章 マハーバラ坑道 買い物分岐判定</h1>
+      <div class="note">9章終了時の所持ギル + 売却品から、到達できる最上位チャートを判定します</div>
+    </div>
+
+    <div class="grid split11">
+      <div class="card" style="margin-bottom:0;">
+        <div class="sec">9章終了時 所持ギル</div>
+        <label class="chk" style="margin-top:0;"><input type="checkbox" data-chk="link"> <span>9章の結果から自動で引き継ぐ</span></label>
+        <div id="linkNote" class="note" style="margin-bottom:8px;"></div>
+        <input type="number" inputmode="numeric" data-bind="base11" step="10" min="0" id="base11">
+
+        <div class="quick">
+          <button class="q" data-gil="500">+500</button>
+          <button class="q" data-gil="2500">+2.5k</button>
+          <button class="q" data-gil="10000">+10k</button>
+          <button class="q" data-gil="0">0に戻す</button>
+          <button class="q m" data-gil="-500">−500</button>
+          <button class="q m" data-gil="-2500">−2.5k</button>
+          <button class="q m" data-gil="-10000">−10k</button>
+          <button class="q wide" id="exact" style="grid-column:span 1;">ぴったり</button>
+        </div>
+
+        <div class="sec">固定売却アイテム</div>
+        <div id="sellList"></div>
+
+        <div class="sec secbtn" style="margin-top:12px;"><span>ランダム売却アイテム</span><button class="link reset" data-reset="1">全部リセット</button></div>
+        <div class="row"><span>クレジットチップ (500G)</span><div class="stepper" style="width:200px;"><button class="sbtn" data-add="rc:-1">−</button><input type="number" data-bind="rc" min="0" max="8"><button class="sbtn" data-add="rc:1">＋</button><button class="sbtn" data-set="rc:0" style="font-size:12px;" title="0個にする">0</button></div></div>
+        <div class="row"><span>プレミアムチップ (2,500G)</span><div class="stepper" style="width:200px;"><button class="sbtn" data-add="rp:-1">−</button><input type="number" data-bind="rp" min="0" max="7"><button class="sbtn" data-add="rp:1">＋</button><button class="sbtn" data-set="rp:0" style="font-size:12px;" title="0個にする">0</button></div></div>
+        <div class="row"><span>輝コバルト鉱 (3,000G)</span><div class="stepper" style="width:200px;"><button class="sbtn" data-add="rcb:-1">−</button><input type="number" data-bind="rcb" min="0" max="1"><button class="sbtn" data-add="rcb:1">＋</button><button class="sbtn" data-set="rcb:0" style="font-size:12px;" title="0個にする">0</button></div></div>
+
+        <div class="row" style="border-top:1px dashed var(--line);padding-top:10px;margin-top:12px;">
+          <span class="note">売却後 合計所持ギル</span><b id="tot11" style="color:var(--accent);font-size:15px;"></b>
+        </div>
+
+        <label class="chk"><input type="checkbox" data-chk="auto"> <span>最上位チャートを自動判定</span></label>
+        <select id="sel11"></select>
+      </div>
+
+      <div class="col11">
+      <div class="card" style="margin-bottom:12px;display:flex;flex-direction:column;">
+        <div class="row"><span class="note">判定結果</span><span id="badge11" class="badge"></span></div>
+        <div id="title11" style="font-size:24px;font-weight:800;color:var(--accent);margin-bottom:8px;"></div>
+        <div id="box11" class="box ok" style="padding:12px;">
+          <div id="box11t" style="font-weight:700;margin-bottom:2px;"></div>
+          <div id="box11s" style="font-size:11px;"></div>
+          <div class="bar"><i id="bar11"></i></div>
+        </div>
+        <div class="sec">購入リスト</div>
+        <table>
+          <thead><tr><th>素材 / 固定枠</th><th class="c">数量</th><th class="r">小計</th></tr></thead>
+          <tbody id="tb11"></tbody>
+        </table>
+        <div class="row" style="border-top:1px dashed var(--line);padding-top:10px;margin-top:auto;">
+          <span class="note">必要合計 <b id="req11" style="color:var(--text);"></b></span>
+          <span class="note">固定枠 24,500G 含む</span>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:0;">
+        <div class="sec">全分岐パターン (タップで選択)</div>
+        <div id="pats"></div>
+      </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <div class="sec">ドロップ確率 (参考): 9章 買い物後</div>
+      <div class="note" style="margin-bottom:8px;line-height:1.6;">
+        ブリッジ1 = PSICOM強襲猟兵×3 + PSICOM特化強襲兵、ブリッジ2 = PSICOM機動コマンド×2 + PSICOM特化強襲兵 + PSICOM戦術導士。<br>
+        レアドロップは5倍判定 (基本5% → 25%)、通常ドロップは25%のまま。レア判定が外れたら通常判定を行います。強襲猟兵・特化強襲兵・機動コマンドは レア=プレミアムチップ / 通常=クレジットチップ、戦術導士は レア=輝コバルト鉱 / 通常=クレジットチップです (ドロップ品・各率ともバトルアルティマニア参照)。
+      </div>
+      <table>
+        <thead><tr><th>アイテム</th><th class="r">期待値</th><th class="r">0個</th><th class="r">1個以上</th><th class="r">2個以上</th><th class="r">3個以上</th><th class="r">4個以上</th></tr></thead>
+        <tbody id="dropTb11"></tbody>
+      </table>
+      <div class="sec" style="margin-top:16px;">各チャートに届くために必要なドロップ</div>
+      <div class="note" style="margin-bottom:8px;line-height:1.6;">
+        いまの合計所持ギル (入力済みのドロップ込み) に、ブリッジ1・2のドロップを足して届く確率です。ブリッジ戦闘後は、実際のドロップを上の入力欄に入れてください (この表は戦闘前の目安です)。
+      </div>
+      <table>
+        <thead><tr><th>チャート</th><th class="r">不足</th><th class="r">届く確率</th></tr></thead>
+        <tbody id="need11"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="foot"><span class="note">入力は自動保存されます</span></div>
+</div>
+
+<div class="gilbar"><div><span class="coin"></span><b id="gilNum">0</b><span>ギル</span><span id="gilNote"></span></div></div>
+
+<script>
+(function () {
+  var KEY = 'ff13rta_v2';
+  var KEEP = 2; // 売却せず残すフェニックスの尾の最低数
+  var C = { fixed: 20275, oil: 1320, crank: 26880, shaman: 3000, potion: 1550, set: 4550, tal: 6000 };
+  // 買い物前: プレミアム 7章7体+9章6体=13、クレジット 9章6体 / ブリッジ: プレミアム最大7、クレジット最大8、輝コバルト最大1 (個別の上限のみ)
+  var MAXD = { prem: 13, cred: 6, rp: 7, rc: 8, rcb: 1 };
+  var BIO = { hone: { n: '極太の骨x37', c: 2960 }, kiba: { n: '呪われた牙x39', c: 3120 } };
+  var SELL = [['精霊の指輪', 60000], ['魔神のタリスマン', 6000], ['テトラクラウン', 15000],
+              ['アリカント', 9000], ['妖魔の呪印', 12500], ['オートクレール', 10000]];
+  var PAT = [
+    { id: 'P1', t: 109940, cond: 88, fang: 0,  bone: 72, tail: 72, jelly: 0  },
+    { id: 'P2', t: 111380, cond: 88, fang: 81, bone: 81, tail: 0,  jelly: 0  },
+    { id: 'P3', t: 114140, cond: 93, fang: 0,  bone: 72, tail: 72, jelly: 0  },
+    { id: 'P4', t: 114980, cond: 94, fang: 0,  bone: 72, tail: 72, jelly: 0  },
+    { id: 'P5', t: 115700, cond: 94, fang: 81, bone: 72, tail: 0,  jelly: 0  },
+    { id: 'P6', t: 116420, cond: 94, fang: 81, bone: 81, tail: 0,  jelly: 0  },
+    { id: 'P7', t: 123860, cond: 94, fang: 39, bone: 72, tail: 72, jelly: 72 },
+    { id: 'P8', t: 126180, cond: 94, fang: 81, bone: 81, tail: 81, jelly: 41 }
+  ];
+  function defaults() {
+    return { tab: '9', bio: 'hone', oil: false, set: true, ph7a: false, ph9a: false,
+      base9: 5000, cred: 0, prem: 0, phoenix: 0, phoenixSell: 0,
+      link: true, base11: 0, sell: [1,1,1,1,1,1], rc: 0, rp: 0, rcb: 0, auto: true, sel: 'P1' };
+  }
+  var S = defaults();
+  try { var raw = localStorage.getItem(KEY); if (raw) S = Object.assign(defaults(), JSON.parse(raw)); } catch (e) {}
+  S.set = true; // セットは常に購入前提
+  function phOwned() { return S.phoenix || 0; }
+  function ph7tip() { var n = (S.ph7a ? 0 : 1) + (S.ph9a ? 0 : 1); return n ? ' (未回収のフェニ尾が' + n + '個あります。回収すれば、あと' + n + '個・+' + (n * 500).toLocaleString() + 'G売れます)' : ''; }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+  var $ = function (id) { return document.getElementById(id); };
+  var fmt = function (n) { return Math.abs(n).toLocaleString() + ' Gil'; };
+  var num = function (v) { v = parseInt(v, 10); return isNaN(v) ? 0 : Math.max(0, v); };
+
+  /* ---------- 計算 ---------- */
+  function calc9() {
+    var bio = BIO[S.bio];
+    var must = C.crank + bio.c;
+    var target = must + (S.set ? C.set : 0);
+    function ev(sell) {
+      var drop = S.cred * 500 + S.prem * 2500 + sell * 500;
+      var noOil = C.fixed + S.base9 + drop;
+      var income = noOil + (S.oil ? C.oil : 0);
+      var diff = income - target;
+      var stage = income < must ? 'A' : diff >= 0 ? 'B' : (diff + C.tal >= 0 ? 'C' : 'D');
+      return { drop: drop, noOil: noOil, income: income, diff: diff, stage: stage, sell: sell };
+    }
+    // フェニックスの尾の売却は、①に届かない場合、または②まで1回目で買える場合のみ考慮する。
+    // 売っても魔神のタリスマン売却 (2回目の買い物) になる場合は考慮しない。
+    var res0 = ev(0), tailsNeeded = res0.stage === 'A', short0 = must - res0.income;
+    var res = ev(S.phoenixSell), ignored = false;
+    if (S.phoenixSell > 0 && res.stage === 'C' && res0.stage === 'C') { res = res0; ignored = true; }
+    var income = res.income, diff = res.diff, stage = res.stage;
+    var L = income - must, first = [], second = [];
+    if (S.set) {
+      var setItem = ['シャーマンサインx1 + ポーションx31 (セット)', C.set];
+      if (stage !== 'A' && L >= C.set) first.push(setItem); else second.push(setItem);
+    }
+    var talSold = stage === 'C' || stage === 'D';
+    var leftover = stage === 'B' ? diff : stage === 'C' ? diff + C.tal : 0;
+    return { bio: bio, must: must, target: target, drop: res.drop, income: income, diff: diff,
+      dNo: res.noOil - target, dWith: res.noOil + C.oil - target, stage: stage,
+      first: first, second: second, talSold: talSold, leftover: leftover,
+      sellEff: res.sell, tailIgnored: ignored, tailsNeeded: tailsNeeded, short0: short0, stage0: res0.stage, shortSet: -res0.diff };
+  }
+  function sellOn(i) { return !!S.sell[i] && !(i === 1 && calc9().talSold); }
+  function effBase11() { return S.link ? calc9().leftover : S.base11; }
+  function sellSum() {
+    var t = 0; SELL.forEach(function (s, i) { if (sellOn(i)) t += s[1]; });
+    return t + S.rc * 500 + S.rp * 2500 + S.rcb * 3000;
+  }
+  function total11() { return effBase11() + sellSum(); }
+  function best(total) {
+    var b = null; PAT.forEach(function (p) { if (total >= p.t) b = p; }); return b;
+  }
+
+  /* ---------- 描画 ---------- */
+  var prevA9 = false;
+  function render9() {
+    var r = calc9(), st = r.stage;
+    $('out9bioN').textContent = r.bio.n; $('out9bioC').textContent = fmt(r.bio.c);
+    $('out9set').textContent = S.set ? fmt(C.set) : '0 Gil';
+    $('row9set').classList.toggle('off', !S.set);
+    $('out9tot').textContent = fmt(r.target);
+    $('in9oil').textContent = '+' + (S.oil ? C.oil : 0).toLocaleString() + ' Gil';
+    $('in9base').textContent = '+' + S.base9.toLocaleString() + ' Gil';
+    $('in9drop').textContent = '+' + r.drop.toLocaleString() + ' Gil';
+    $('in9tot').textContent = fmt(r.income);
+
+    var cls, sub, badge, bcls, main, next;
+    if (st === 'A') {
+      cls = 'ng'; sub = '1回目の必須購入 (クランク軸+生体素材) に届いていません'; badge = '必須不足'; bcls = 'b-ng';
+      main = '−' + fmt(r.income - r.must);
+      var csA = Math.max(0, phOwned() - KEEP), rmA = csA - r.sellEff, ndA = Math.ceil((r.must - r.income) / 500);
+      next = ndA <= rmA ? '→ フェニックスの尾をあと ' + ndA + ' 個売れば①に届きます'
+        : rmA > 0 ? '→ フェニ尾を残り ' + rmA + ' 個全て売っても①に届きません' + ph7tip()
+        : '→ 売れるフェニ尾がなく、①に届きません (最低' + KEEP + '個は残します)' + ph7tip();
+    } else if (st === 'B') {
+      cls = 'ok'; sub = '1回目の買い物で全て購入できます'; badge = '1回で完了'; bcls = 'b-ok';
+      main = '+' + fmt(r.diff); next = '→ 11章へ持ち越し: ' + fmt(r.leftover);
+    } else if (st === 'C') {
+      cls = 'warn'; sub = '1回目では足りません → 9章2回目の買い物が必要'; badge = '2回買い物'; bcls = 'b-ng';
+      main = '−' + fmt(r.diff); next = '→ 魔神のタリスマン (+6,000G) を売って補填 / 11章へ持ち越し: ' + fmt(r.leftover);
+    } else {
+      cls = 'ng'; sub = '魔神のタリスマンを売却しても足りません'; badge = '不足'; bcls = 'b-ng';
+      main = '−' + fmt(r.diff + C.tal); next = '→ タリスマン売却後も不足 (選択購入を減らすかオイル回収を検討)';
+    }
+    $('st9').className = 'box ' + cls;
+    $('st9sub').textContent = sub;
+    $('st9badge').textContent = badge; $('st9badge').className = 'badge ' + bcls;
+    $('st9main').textContent = main;
+    $('st9next').textContent = next;
+
+    var A = r.stage === 'A', after = r.income - r.must;
+    var when = !S.set ? 'none' : A ? 'blocked' : (r.first.length ? 'first' : 'second');
+    var c1 = '<div class="step ' + (A ? 'ng' : 'ok') + '"><div class="step-h"><b>① 1回目</b><span class="badge ' + (A ? 'b-ng' : 'b-ok') + '">' + (A ? '不足' : '購入可') + '</span></div>' +
+      '<div class="row"><span>クランク軸x32</span><span>26,880 Gil</span></div>' +
+      '<div class="row"><span>' + r.bio.n + '</span><span>' + fmt(r.bio.c) + '</span></div>' +
+      '<div class="row tot"><span>小計</span><b>' + fmt(r.must) + '</b></div>' +
+      '<div class="row"><span class="note">① 終了後の所持ギル</span><b class="' + (after < 0 ? 'neg' : 'gold') + '">' + (after < 0 ? '−' : '') + fmt(after) + '</b></div></div>';
+    var cls2 = { none: '', blocked: 'ng', first: 'ok', second: 'warn' }[when];
+    var bd2 = { none: '<span class="badge b-mute">購入しない</span>', blocked: '<span class="badge b-ng">①が先</span>',
+      first: '<span class="badge b-ok">1回目で購入</span>', second: '<span class="badge b-warn">2回目へ</span>' }[when];
+    var c2 = '<div class="step ' + cls2 + (S.set ? '' : ' mute') + '"><div class="step-h"><b>② ' + (when === 'second' ? '2回目' : 'セット') + '</b>' + bd2 + '</div>';
+    if (r.talSold) c2 += '<div class="row"><span>魔神のタリスマン売却</span><b class="gold">+' + C.tal.toLocaleString() + ' Gil</b></div>';
+    c2 += '<div class="row"><span>シャーマンサインx1 + ポーションx31</span><span>' + fmt(C.set) + '</span></div>';
+    if (S.set && !A) c2 += '<div class="row tot"><span class="note">' + (when === 'first' ? '① 後の余りで買えます' : '① 後の余りでは足りません') + '</span><b>' + (r.leftover >= 0 && r.stage !== 'D' ? '余り ' + fmt(r.leftover) : '不足 ' + fmt(r.diff + C.tal)) + '</b></div>';
+    c2 += '</div>';
+    var alt = ['hone', 'kiba'].map(function (k) {
+      var x = r.income - (C.crank + BIO[k].c);
+      return (k === 'hone' ? '骨37' : '牙39') + ' ①後 ' + (x < 0 ? '−' : '') + fmt(x) + (x < 0 ? ' (不足)' : x >= C.set ? ' → 1回目で完了' : ' → 2回目へ');
+    });
+    $('plan9').innerHTML = '<div class="steps">' + c1 + c2 + '</div>' + (S.set ? '<div class="note" style="margin:-4px 0 12px;">' + alt.join(' ／ ') + '</div>' : '');
+
+    var tal = r.talSold ? C.tal : 0;
+    var scale = Math.max(r.target, r.income + tal, 1);
+    var pc = function (v) { return Math.max(0, Math.min(100, v / scale * 100)); };
+    var mt = '<div class="meter"><div class="f inc" style="width:' + pc(r.income) + '%"></div>';
+    if (tal) mt += '<div class="f tal" style="left:' + pc(r.income) + '%;width:' + (pc(r.income + tal) - pc(r.income)) + '%"></div>';
+    mt += '<div class="tick up" style="left:' + pc(r.must) + '%"><span>① ' + r.must.toLocaleString() + '</span></div>';
+    if (S.set) mt += '<div class="tick end" style="left:' + pc(r.target) + '%"><span>② ' + r.target.toLocaleString() + '</span></div>';
+    mt += '</div><div class="legend"><span><i class="sw inc"></i>所持金+売却額</span>' + (tal ? '<span><i class="sw tal"></i>魔神のタリスマン売却 +6,000</span>' : '') + '</div>';
+    $('meter9').innerHTML = mt;
+
+    var owned = phOwned(), canSell = Math.max(0, owned - KEEP), remain = canSell - r.sellEff, hint9;
+    var needSet = Math.ceil(Math.max(0, r.shortSet) / 500);
+    var setTxt = needSet <= canSell ? 'あと合計 ' + needSet + ' 個売ると①②とも1回目で買えます' : '全て売っても②には届きません';
+    if (r.stage0 === 'B') {
+      hint9 = '①②とも届くので、フェニ尾は売却しません (売却可能 ' + canSell + ' 個)。';
+    } else if (r.tailIgnored) {
+      hint9 = '※ 2回目の買い物(タリスマン売却)になるため、フェニ尾の売却 (' + S.phoenixSell + ' 個) は反映していません。' + (owned > 0 ? ' 売却可能 ' + canSell + ' 個。' + setTxt + '。' : '');
+    } else if (r.stage0 === 'A') {
+      if (owned <= 0) hint9 = '①に届きません。フェニ尾の所持数を入れると、売却できる数 (最低' + KEEP + '個は残す) を計算します。' + ph7tip();
+      else if (r.stage !== 'A') hint9 = (r.stage === 'B' ? '①②に届くよう、' : '①に届くよう、') + 'フェニ尾を ' + r.sellEff + ' 個売却します (売却可能 ' + canSell + ' 個)。';
+      else {
+        var need = Math.ceil((r.must - r.income) / 500);
+        if (need <= remain) hint9 = '売却可能 ' + canSell + ' 個。あと ' + need + ' 個売ると①に届きます。';
+        else if (remain > 0) hint9 = '売却可能 ' + canSell + ' 個。残り ' + remain + ' 個を全て売っても ' + ((r.must - r.income) - remain * 500).toLocaleString() + ' Gil 足りません。' + ph7tip();
+        else hint9 = '売却できるフェニ尾がありません (最低' + KEEP + '個は残します)。' + ph7tip();
+      }
+    } else if (owned <= 0) {
+      hint9 = 'フェニ尾の所持数を入れると、②まで1回目で買えるか計算します。';
+    } else if (r.stage === 'B') {
+      hint9 = '②まで1回目で買えるよう、フェニ尾を ' + r.sellEff + ' 個売却します (売却可能 ' + canSell + ' 個)。';
+    } else {
+      hint9 = '売却可能 ' + canSell + ' 個。' + setTxt + '。';
+    }
+    $('phHint').textContent = hint9;
+    var phSum;
+    if (r.stage0 === 'A') phSum = '⚠ ①に届きません: フェニ尾の売却が必要です';
+    else if (r.sellEff > 0) phSum = 'フェニ尾を ' + r.sellEff + ' 個売却 (+' + (r.sellEff * 500).toLocaleString() + 'G)';
+    else phSum = 'フェニ尾の売却: しない (足りないときだけ使います)';
+    $('phSum').textContent = phSum;
+    $('phFold').classList.toggle('need', r.stage0 === 'A');
+    $('phNote').style.display = r.stage0 === 'A' ? 'none' : '';
+    if (r.stage0 === 'A' && !prevA9) $('phFold').open = true;
+    prevA9 = r.stage0 === 'A';
+
+    var box = $('oil9'), t, s, left;
+    if (st === 'A') {
+      if ((r.income - r.must + (S.oil ? 0 : C.oil)) >= 0) {
+        box.className = 'box warn'; t = 'シリコンオイル: 回収が必要';
+        s = '回収すれば1回目の必須購入に届きます (余り ' + fmt(r.income - r.must + (S.oil ? 0 : C.oil)) + ')。';
+      } else {
+        box.className = 'box ng'; t = 'シリコンオイル: 回収しても必須購入に不足';
+        s = '回収してもあと ' + fmt(r.income - r.must + (S.oil ? 0 : C.oil)) + ' 不足です。';
+      }
+    } else if (r.dNo >= 0) {
+      box.className = 'box ok'; t = 'シリコンオイル: 回収不要';
+      s = 'オイルなしで1回目に全て買えて ' + fmt(r.dNo) + ' 余ります。';
+    } else if (r.dWith >= 0) {
+      box.className = 'box warn'; t = 'シリコンオイル: 回収すれば2回目の買い物を省略できる';
+      s = '回収すると1回目で全て買えて ' + fmt(r.dWith) + ' 余ります。回収しない場合は、タリスマン売却+2回目の買い物で ' + fmt(r.dNo + C.tal) + ' 余ります。';
+    } else if (r.dNo + C.tal >= 0) {
+      box.className = 'box warn'; t = 'シリコンオイル: 回収しなくても足りる (2回目の買い物あり)';
+      s = 'オイルなし: タリスマン売却+2回目の買い物で ' + fmt(r.dNo + C.tal) + ' 余ります。';
+    } else if (r.dWith + C.tal >= 0) {
+      box.className = 'box warn'; t = 'シリコンオイル: 回収が必要 (2回目の買い物あり)';
+      s = 'オイルなしだとタリスマン売却後も ' + fmt(r.dNo + C.tal) + ' 不足。回収+タリスマン売却で ' + fmt(r.dWith + C.tal) + ' 余ります。';
+    } else {
+      left = -(r.dWith + C.tal);
+      var hint;
+      hint = C.set >= left ? 'セット(4,550G)を買わなければ到達できます。' : 'セットを買わなくても足りません。';
+      box.className = 'box ng'; t = 'シリコンオイル: 回収+タリスマン売却でも不足';
+      s = 'あと ' + fmt(left) + ' 不足。' + hint;
+    }
+    $('oil9t').textContent = t; $('oil9s').textContent = s;
+  }
+
+  // ブリッジ1・2のドロップで増えるギルの分布 (1体につき レア→通常 の順に判定、1体1個まで)
+  var GAIN = (function () {
+    var enemies = [], i;
+    for (i = 0; i < 7; i++) enemies.push([[2500, 0.25], [500, 0.75 * 0.25]]);   // 強襲猟兵×3, 特化強襲兵×2, 機動コマンド×2
+    enemies.push([[3000, 0.25], [500, 0.75 * 0.25]]);                           // 戦術導士 (レア=輝コバルト鉱)
+    var d = { 0: 1 };
+    enemies.forEach(function (e) {
+      var nd = {}, rest = 1 - e[0][1] - e[1][1];
+      Object.keys(d).forEach(function (k) {
+        k = +k; var p = d[k];
+        nd[k] = (nd[k] || 0) + p * rest;
+        e.forEach(function (o) { nd[k + o[0]] = (nd[k + o[0]] || 0) + p * o[1]; });
+      });
+      d = nd;
+    });
+    return d;
+  })();
+  function gainProb(need) {
+    if (need <= 0) return 1;
+    var s = 0;
+    Object.keys(GAIN).forEach(function (k) { if (+k >= need) s += GAIN[k]; });
+    return s;
+  }
+  function render11() {
+    var base = effBase11(), total = total11();
+    $('tot11').textContent = fmt(total);
+    var c9 = calc9(), ok9 = c9.stage === 'B' || c9.stage === 'C';
+    $('linkNote').textContent = S.link
+      ? (!ok9
+          ? '9章で買い物を賄えていません (不足 ' + fmt(c9.stage === 'D' ? c9.diff + C.tal : c9.must - c9.income) + ')。持ち越しは 0 Gil 扱いです。9章タブを確認してください'
+          : c9.stage === 'C'
+            ? '9章 2回目の買い物後の余り ' + fmt(c9.leftover) + ' を使用中 (魔神のタリスマン売却 +6,000G 込み・11章の売却リストからは除外)'
+            : '9章 1回目の買い物後の余り ' + fmt(c9.leftover) + ' を使用中')
+        + ' (手入力すると自動引き継ぎをオフにします)'
+      : '手入力モードです';
+
+    var top = best(total);
+    if (S.auto) S.sel = top ? top.id : 'P1';
+    var cur = PAT.filter(function (p) { return p.id === S.sel; })[0];
+    $('sel11').value = S.sel;
+
+    $('title11').textContent = cur.id + ' チャート';
+    $('req11').textContent = fmt(cur.t);
+    var ok = total >= cur.t;
+    $('badge11').textContent = ok ? '達成可能' : '資金不足';
+    $('badge11').className = 'badge ' + (ok ? 'b-ok' : 'b-ng');
+    $('box11').className = 'box ' + (ok ? 'ok' : 'ng');
+    var idx = PAT.indexOf(cur), msg;
+    if (ok) {
+      $('box11t').textContent = cur.id + ' 到達可能 (余り ' + fmt(total - cur.t) + ')';
+      msg = idx < PAT.length - 1 ? '上位 ' + PAT[idx + 1].id + ' まであと ' + fmt(PAT[idx + 1].t - total) : '最上位チャートです';
+    } else {
+      $('box11t').textContent = cur.id + ' 未達';
+      msg = 'あと ' + fmt(cur.t - total) + ' 不足';
+    }
+    $('box11s').textContent = msg;
+    var goal = ok && idx < PAT.length - 1 ? PAT[idx + 1].t : cur.t;
+    $('bar11').style.width = Math.min(100, total / goal * 100) + '%';
+
+    var rows = [['超伝導体 (840G)', cur.cond, 840], ['呪われた牙 (80G)', cur.fang, 80], ['極太の骨 (80G)', cur.bone, 80],
+                ['蛇蝎の尾 (80G)', cur.tail, 80], ['彩りゼリー (80G)', cur.jelly, 80]];
+    var h = '';
+    rows.forEach(function (x) { if (x[1] > 0) h += '<tr><td>' + x[0] + '</td><td class="c">' + x[1] + ' 個</td><td class="r">' + (x[1] * x[2]).toLocaleString() + ' G</td></tr>'; });
+    h += '<tr><td>固定枠 (ブラックベルト/ウォリアーリスト×2)</td><td class="c">-</td><td class="r">24,500 G</td></tr>';
+    $('tb11').innerHTML = h;
+
+    var ph = '';
+    PAT.forEach(function (p) {
+      var can = total >= p.t, isBest = top && top.id === p.id;
+      var b = isBest ? '<span class="badge b-best">最高到達</span>'
+            : can ? '<span class="badge b-ok">可能</span>'
+            : '<span class="badge b-ng">あと ' + (p.t - total).toLocaleString() + '</span>';
+      ph += '<div class="pat' + (p.id === S.sel ? ' sel' : '') + '" data-pat="' + p.id + '">' +
+        '<div><b>' + p.id + '</b> <span class="note">超伝導体 ' + p.cond + ' / 生体 ' + (p.fang + p.bone + p.tail + p.jelly) + '</span></div>' +
+        '<div style="display:flex;gap:10px;align-items:center;"><b>' + p.t.toLocaleString() + ' G</b>' + b + '</div></div>';
+    });
+    $('pats').innerHTML = ph;
+
+    var nh = '';
+    PAT.forEach(function (p) {
+      var need = p.t - total;
+      if (need <= 0) {
+        nh += '<tr><td>' + p.id + '</td><td class="r">-</td><td class="r">到達済み</td></tr>';
+      } else {
+        var pr = gainProb(need) * 100;
+        var ps = pr > 0 && pr < 0.05 ? '0.1%未満' : pr.toFixed(1) + '%';
+        nh += '<tr><td>' + p.id + '</td><td class="r">' + need.toLocaleString() + ' G</td><td class="r">' + ps + '</td></tr>';
+      }
+    });
+    $('need11').innerHTML = nh;
+  }
+
+  function syncInputs() {
+    document.querySelectorAll('[data-bind]').forEach(function (el) {
+      if (document.activeElement === el) return;
+      var k = el.getAttribute('data-bind');
+      el.value = k === 'base11' ? effBase11() : S[k];
+    });
+    document.querySelectorAll('[data-chk]').forEach(function (el) { el.checked = !!S[el.getAttribute('data-chk')]; });
+    var tsold = calc9().talSold;
+    document.querySelectorAll('[data-sell]').forEach(function (el) { var i = +el.getAttribute('data-sell'); el.checked = sellOn(i); el.disabled = (i === 1 && tsold); });
+    $('talNote').textContent = tsold ? '← 9章で売却済み' : '';
+    document.querySelectorAll('#bioSeg button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-bio') === S.bio); });
+    document.querySelectorAll('.tab').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-tab') === S.tab); });
+    $('pane9').classList.toggle('on', S.tab === '9');
+    $('pane11').classList.toggle('on', S.tab === '11');
+  }
+  function render() {
+    S.phoenixSell = Math.min(S.phoenixSell || 0, Math.max(0, phOwned() - KEEP));
+    // ドロップ数の上限 (1体から出るのは1個まで)
+    S.prem = Math.min(S.prem || 0, MAXD.prem); S.cred = Math.min(S.cred || 0, MAXD.cred);
+    S.rp = Math.min(S.rp || 0, MAXD.rp); S.rcb = Math.min(S.rcb || 0, MAXD.rcb); S.rc = Math.min(S.rc || 0, MAXD.rc);
+    render9(); render11(); syncInputs();
+    var is9 = S.tab === '9';
+    $('gilNum').textContent = (is9 ? calc9().income : total11()).toLocaleString();
+    var gn = $('gilNote'), gm = '', gs = '', gc = '';
+    if (is9) {
+      var r = calc9();
+      if (r.stage === 'B') { gc = 'ok'; gm = '1回目で完了'; gs = '余り ' + fmt(r.diff); }
+      else if (r.stage === 'C') { gc = 'warn'; gm = '2回目の買い物が必要'; gs = 'タリスマン売却後 余り ' + fmt(r.leftover); }
+      else if (r.stage === 'A') { gc = 'ng'; gm = '①に届きません'; gs = '不足 ' + fmt(r.must - r.income); }
+      else { gc = 'ng'; gm = 'タリスマン売却でも不足'; gs = '不足 ' + fmt(r.diff + C.tal); }
+    } else {
+      var t11 = total11(), b11 = best(t11), i11 = b11 ? PAT.indexOf(b11) : -1;
+      if (!b11) { gc = 'ng'; gm = 'P1 未達'; gs = 'あと ' + fmt(PAT[0].t - t11); }
+      else if (i11 === PAT.length - 1) { gc = 'ok'; gm = b11.id + ' 到達可能'; gs = '最上位チャートです'; }
+      else { gc = 'ok'; gm = b11.id + ' 到達可能'; gs = PAT[i11 + 1].id + ' まであと ' + fmt(PAT[i11 + 1].t - t11); }
+    }
+    gn.className = gc; gn.innerHTML = gm + '<small>' + gs + '</small>';
+    $('helpText').textContent = is9 ? '9章の買い物に必要なギルが足りるか確認します。' : 'マハーバラ坑道で到達できるチャートを判定します。';
+    save();
+  }
+
+  /* ---------- 初期UI生成 ---------- */
+  var sl = '';
+  SELL.forEach(function (s, i) { sl += '<label class="chk"><input type="checkbox" data-sell="' + i + '"> ' + s[0] + ' (' + s[1].toLocaleString() + 'G)' + (i === 1 ? ' <span class="note" id="talNote"></span>' : '') + '</label>'; });
+  $('sellList').innerHTML = sl;
+  var so = '';
+  PAT.forEach(function (p) { so += '<option value="' + p.id + '">' + p.id + ' (' + p.t.toLocaleString() + ' Gil)</option>'; });
+  $('sel11').innerHTML = so;
+
+  /* ---------- イベント ---------- */
+  var resetTimer = null;
+  function takeManual() { if (S.link) { S.base11 = effBase11(); S.link = false; } }
+
+  document.addEventListener('focusin', function (e) {
+    var el = e.target;
+    if (el && el.type === 'number') setTimeout(function () { try { el.select(); } catch (x) {} }, 0);
+  });
+  document.addEventListener('input', function (e) {
+    var k = e.target.getAttribute && e.target.getAttribute('data-bind');
+    if (!k) return;
+    if (k === 'base11') S.link = false;
+    S[k] = num(e.target.value);
+    render();
+  });
+  document.addEventListener('change', function (e) {
+    var t = e.target, k = t.getAttribute('data-chk'), s = t.getAttribute('data-sell');
+    if (k) {
+      S[k] = t.checked;
+      if (k === 'ph7a' || k === 'ph9a') S.phoenix = Math.max(0, (S.phoenix || 0) + (t.checked ? 1 : -1));
+      if (k === 'link' && t.checked === false) S.base11 = effBase11();
+      render();
+    } else if (s !== null) { S.sell[+s] = t.checked ? 1 : 0; render(); }
+    else if (t.id === 'sel11') { S.auto = false; S.sel = t.value; render(); }
+  });
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('button, .pat'); if (!t) return;
+    if (t.classList.contains('tab')) { S.tab = t.getAttribute('data-tab'); render(); return; }
+    if (t.hasAttribute('data-phneed')) {
+      var rr = calc9(), cs = Math.max(0, phOwned() - KEEP), ns = Math.ceil(Math.max(0, rr.shortSet) / 500), want = 0;
+      if (rr.stage0 !== 'B') want = ns <= cs ? ns : (rr.tailsNeeded ? Math.ceil(rr.short0 / 500) : 0);
+      S.phoenixSell = Math.min(cs, want); render(); return;
+    }
+    if (t.hasAttribute('data-phmax')) { S.phoenixSell = Math.max(0, phOwned() - KEEP); render(); return; }
+    if (t.hasAttribute('data-bio')) { S.bio = t.getAttribute('data-bio'); render(); return; }
+    if (t.hasAttribute('data-set')) { var sv = t.getAttribute('data-set').split(':'); S[sv[0]] = parseInt(sv[1], 10) || 0; render(); return; }
+    if (t.hasAttribute('data-add')) {
+      var a = t.getAttribute('data-add').split(':');
+      S[a[0]] = Math.max(0, (S[a[0]] || 0) + parseInt(a[1], 10)); render(); return;
+    }
+    if (t.hasAttribute('data-gil')) {
+      var d = parseInt(t.getAttribute('data-gil'), 10);
+      if (d === 0) { S.link = false; S.base11 = 0; }
+      else { takeManual(); S.base11 = Math.max(0, S.base11 + d); }
+      render(); return;
+    }
+    if (t.id === 'exact') {
+      var cur = PAT.filter(function (p) { return p.id === S.sel; })[0];
+      S.link = false; S.base11 = Math.max(0, cur.t - sellSum()); render(); return;
+    }
+    if (t.classList.contains('pat')) { S.auto = false; S.sel = t.getAttribute('data-pat'); render(); return; }
+    if (t.hasAttribute('data-reset')) {
+      // confirm() はアプリ内プレビューで無効になるため、2回押しで確定する方式にする
+      var all = document.querySelectorAll('[data-reset]');
+      if (t.getAttribute('data-arm') === '1') {
+        clearTimeout(resetTimer);
+        all.forEach(function (x) { x.removeAttribute('data-arm'); x.textContent = '全部リセット'; });
+        var keepTab = S.tab; S = defaults(); S.tab = keepTab; render();
+      } else {
+        all.forEach(function (x) { x.setAttribute('data-arm', '1'); x.textContent = 'もう一度押すとリセット'; });
+        resetTimer = setTimeout(function () { all.forEach(function (x) { x.removeAttribute('data-arm'); x.textContent = '全部リセット'; }); }, 4000);
+      }
+    }
+  });
+
+  function dist(groups) {
+    var d = [1];
+    groups.forEach(function (g) {
+      for (var i = 0; i < g[0]; i++) {
+        var nd = new Array(d.length + 1).fill(0);
+        for (var k = 0; k < d.length; k++) { nd[k] += d[k] * (1 - g[1]); nd[k + 1] += d[k] * g[1]; }
+        d = nd;
+      }
+    });
+    return d;
+  }
+  (function buildDrops() {
+    var rows = [
+      ['プレミアムチップ 7章 (4体+3体 / 10%)', [[7, 0.10]]],
+      ['プレミアムチップ 9章 (3体+3体 / 25%)', [[6, 0.25]]],
+      ['プレミアムチップ 合計', [[7, 0.10], [6, 0.25]]],
+      ['フェニックスの尾 7章 (通常 10%)', [[7, 0.9 * 0.10]]],
+      ['クレジットチップ 9章 (通常 25%)', [[6, 0.75 * 0.25]]]
+    ];
+    var rows11 = [
+      ['プレミアムチップ ブリッジ1+2 (7体 / レア25%)', [[7, 0.25]]],
+      ['クレジットチップ ブリッジ1+2 (8体 / 通常25%)', [[8, 0.75 * 0.25]]],
+      ['輝コバルト鉱 ブリッジ2 戦術導士 (レア25%)', [[1, 0.25]]]
+    ];
+    function build(rs, id) {
+      var out = '';
+      rs.forEach(function (r) {
+        var d = dist(r[1]), ev = 0;
+        d.forEach(function (p, k) { ev += p * k; });
+        out += '<tr><td>' + r[0] + '</td><td class="r">' + ev.toFixed(2) + '</td>';
+        out += '<td class="r">' + (d[0] * 100).toFixed(1) + '%</td>';
+        for (var k = 1; k <= 4; k++) {
+          var ge = 0; for (var j = k; j < d.length; j++) ge += d[j];
+          out += '<td class="r">' + (ge * 100).toFixed(1) + '%</td>';
+        }
+        out += '</tr>';
+      });
+      $(id).innerHTML = out;
+    }
+    build(rows, 'dropTb'); build(rows11, 'dropTb11');
+  })();
+
+  render();
+})();
+</script>
+</body>
+</html>
