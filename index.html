@@ -176,7 +176,8 @@
   .steps { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
   @media (max-width: 640px) { .steps { grid-template-columns: 1fr; } }
   .step { background: rgba(0,0,0,.42); border: 1px solid var(--line); padding: 12px; }
-  .step.ok { border-color: var(--ok-bd); } .step.warn { border-color: var(--warn-bd); } .step.ng { border-color: var(--ng-bd); }
+  .step.ok { background: var(--ok-bg); border-color: var(--ok-bd); } .step.warn { background: var(--warn-bg); border-color: var(--warn-bd); } .step.ng { background: var(--ng-bg); border-color: var(--ng-bd); }
+  .step.ok .step-h b { color: var(--ok); } .step.warn .step-h b { color: var(--warn); } .step.ng .step-h b { color: var(--ng); }
   .step.mute { opacity: .55; }
   .step-h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 14px; }
   .step .tot { border-top: 1px solid var(--line2); padding-top: 6px; margin-top: 6px; }
