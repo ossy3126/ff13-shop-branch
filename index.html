@@ -486,7 +486,7 @@
       var setItem = ['シャーマンサインx1 + ポーションx31 (セット)', C.set];
       if (stage !== 'A' && L >= C.set) first.push(setItem); else second.push(setItem);
     }
-    var talSold = stage === 'C' || stage === 'D';
+    var talSold = stage !== 'B'; // 1回目で足りなければ2回目の買い物で必ず魔神のタリスマンを売る
     // 足りない場合 (A/D) もマイナスのまま11章へ引き継ぐ (必須+セットを買った想定の収支)
     var leftover = diff + (talSold ? C.tal : 0);
     return { bio: bio, must: must, target: target, drop: res.drop, income: income, diff: diff,
@@ -668,7 +668,7 @@
     var c9 = calc9(), ok9 = c9.stage === 'B' || c9.stage === 'C';
     $('linkNote').textContent = S.link
       ? (!ok9
-          ? '9章で買い物を賄えていません。不足分をマイナスのまま (' + sfmt(c9.leftover) + ') 引き継いで使用中です。9章タブを確認してください'
+          ? '9章で買い物を賄えていません。魔神のタリスマン売却 +6,000G 込みで、不足分をマイナスのまま (' + sfmt(c9.leftover) + ') 引き継いで使用中です (11章の売却リストからタリスマンは除外)。9章タブを確認してください'
           : c9.stage === 'C'
             ? '9章 2回目の買い物後の余り ' + fmt(c9.leftover) + ' を使用中 (魔神のタリスマン売却 +6,000G 込み・11章の売却リストからは除外)'
             : '9章 1回目の買い物後の余り ' + fmt(c9.leftover) + ' を使用中')
