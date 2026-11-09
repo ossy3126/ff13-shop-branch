@@ -344,7 +344,7 @@
     </div>
 
     <div class="card">
-      <div class="sec">ドロップ確率 (参考)</div>
+      <details class="fold"><summary>ドロップ確率 (参考) を見る</summary>
       <div class="note" style="margin-bottom:8px;line-height:1.6;">
         7章 ホープ邸1戦目 = PSICOM駆逐兵×2 + PSICOM飛空狙撃兵×2、2戦目 = PSICOM駆逐猟兵×2 + PSICOM特化駆逐兵。<br>
         9章 パラメキア1戦目 = PSICOM強襲兵×2 + PSICOM強襲猟兵、2戦目 = PSICOM強襲兵 + PSICOM強襲猟兵×2。<br>
@@ -357,6 +357,7 @@
         <tbody id="dropTb"></tbody>
       </table>
       </div>
+      </details>
     </div>
   </div>
 
@@ -429,7 +430,7 @@
     </div>
 
     <div class="card" style="margin-top:12px;">
-      <div class="sec">ドロップ確率 (参考): 9章 買い物後</div>
+      <details class="fold"><summary>ドロップ確率 (参考): 9章 買い物後 を見る</summary>
       <div class="note" style="margin-bottom:8px;line-height:1.6;">
         ブリッジ1 = PSICOM強襲猟兵×3 + PSICOM特化強襲兵、ブリッジ2 = PSICOM機動コマンド×2 + PSICOM特化強襲兵 + PSICOM戦術導士。<br>
         レアドロップは5倍判定 (基本5% → 25%)、通常ドロップは25%のまま。レア判定が外れたら通常判定を行います。強襲猟兵・特化強襲兵・機動コマンドは レア=プレミアムチップ / 通常=クレジットチップ、戦術導士は レア=輝コバルト鉱 / 通常=クレジットチップです (ドロップ品・各率ともバトルアルティマニア参照)。
@@ -440,6 +441,7 @@
         <tbody id="dropTb11"></tbody>
       </table>
       </div>
+      </details>
       <div class="sec" style="margin-top:16px;">各チャートに届くために必要なドロップ</div>
       <div class="note" style="margin-bottom:8px;line-height:1.6;">
         いまの合計所持ギル (入力済みのドロップ込み) に、ブリッジ1・2のドロップを足して届く確率です。ブリッジ戦闘後は、実際のドロップを上の入力欄に入れてください (この表は戦闘前の目安です)。
@@ -556,8 +558,8 @@
       main = '−' + fmt(r.income - r.must);
       var csA = Math.max(0, phOwned() - KEEP), rmA = csA - r.sellEff, ndA = Math.ceil((r.must - r.income) / 500);
       next = ndA <= rmA ? '→ フェニックスの尾をあと ' + ndA + ' 個売れば①に届きます'
-        : rmA > 0 ? '→ フェニ尾を残り ' + rmA + ' 個全て売っても①に届きません' + ph7tip()
-        : '→ 売れるフェニ尾がなく、①に届きません (最低' + KEEP + '個は残す目安です)' + ph7tip();
+        : rmA > 0 ? '→ フェニ尾を全て売っても①に届きません'
+        : '→ 売れるフェニ尾がなく、①に届きません';
       next += ' / 11章へは ' + sfmt(r.leftover) + ' で持ち越し';
     } else if (st === 'B') {
       cls = 'ok'; sub = '1回目の買い物で全て購入できます'; badge = '1回で完了'; bcls = 'b-ok';
@@ -713,11 +715,10 @@
     var c9 = calc9(), ok9 = c9.stage === 'B' || c9.stage === 'C';
     $('linkNote').textContent = S.link
       ? (!ok9
-          ? '9章で買い物を賄えていません。魔神のタリスマン売却 +6,000G 込みで、不足分をマイナスのまま (' + sfmt(c9.leftover) + ') 引き継いで使用中です (11章の売却リストからタリスマンは除外)。9章タブを確認してください'
+          ? '9章で足りません。タリスマン売却込みの ' + sfmt(c9.leftover) + ' を引き継ぎ中'
           : c9.stage === 'C'
-            ? '9章 2回目の買い物後の余り ' + fmt(c9.leftover) + ' を使用中 (魔神のタリスマン売却 +6,000G 込み・11章の売却リストからは除外)'
-            : '9章 1回目の買い物後の余り ' + fmt(c9.leftover) + ' を使用中')
-        + ' (手入力すると自動引き継ぎをオフにします)'
+            ? '9章 2回目の買い物後の余り ' + fmt(c9.leftover) + ' を引き継ぎ中 (タリスマン売却込み)'
+            : '9章 1回目の買い物後の余り ' + fmt(c9.leftover) + ' を引き継ぎ中')
       : '手入力モードです';
 
     var top = best(total);
