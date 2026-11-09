@@ -390,7 +390,6 @@
           <button class="q m" data-gil="-500">−500</button>
           <button class="q m" data-gil="-2500">−2.5k</button>
           <button class="q m" data-gil="-10000">−10k</button>
-          <button class="q wide" id="exact" style="grid-column:span 1;">ぴったり</button>
         </div>
 
         <div class="sec">固定売却アイテム</div>
@@ -917,10 +916,6 @@
       if (d === 0) { S.link = false; S.base11 = 0; }
       else { takeManual(); S.base11 = S.base11 + d; }
       render(); return;
-    }
-    if (t.id === 'exact') {
-      var cur = PAT.filter(function (p) { return p.id === S.sel; })[0];
-      S.link = false; S.base11 = Math.max(0, cur.t - sellSum()); render(); return;
     }
     if (t.classList.contains('pat')) { S.auto = false; S.sel = t.getAttribute('data-pat'); render(); return; }
     if (t.hasAttribute('data-reset')) {
