@@ -236,7 +236,7 @@
 </head>
 <body>
 <div class="app">
-  <div class="helpbar"><span class="helplogo">HELP</span><span id="helpText"></span></div>
+  <div class="helpbar"><span class="helplogo">FF13</span><span id="helpText"></span></div>
   <div class="tabs">
     <button class="tab on" data-tab="9">9章</button>
     <button class="tab" data-tab="11">11章</button>
@@ -858,7 +858,7 @@
       else { gc = 'ok'; gm = b11.id + ' 到達可能'; gs = PAT[i11 + 1].id + ' まであと ' + fmt(PAT[i11 + 1].t - t11); }
     }
     gn.className = gc; gn.innerHTML = gm + '<small>' + gs + '</small>';
-    $('helpText').textContent = is9 ? '9章の買い物に必要なギルが足りるか確認します。' : 'マハーバラ坑道で到達できるチャートを判定します。';
+    $('helpText').textContent = is9 ? '買い物分岐 ｜ 9章の買い物に必要なギルが足りるか確認します。' : '買い物分岐 ｜ マハーバラ坑道で到達できるチャートを判定します。';
     save();
   }
 
