@@ -263,6 +263,7 @@
       <label class="opt" style="margin:6px 0 4px;"><span>シリコンオイル回収 (+1,320G)</span><input type="checkbox" data-chk="oil"></label>
       <details class="fold" id="phFold"><summary id="phSum"></summary>
         <div class="note" id="phNote" style="margin:2px 0 8px;">フェニックスの尾の売却は、足りないときだけ使う手段です。通常は売却数を0のままにしてください。</div>
+        <div class="note" style="margin:0 0 8px;line-height:1.6;color:var(--warn);">最低2個は残すのが目安です。カラヴィンカ戦とバハムート戦で、1個ずつ使いたいためです。特にカラヴィンカ戦では、1個使う可能性が高いです。</div>
         <div class="grid" style="margin-bottom:4px;">
           <div><span class="lbl">フェニックスの尾 所持数</span>
             <div class="stepper"><button class="sbtn" data-add="phoenix:-1">−</button><input type="number" inputmode="numeric" data-bind="phoenix" min="0"><button class="sbtn" data-add="phoenix:1">＋</button></div></div>
@@ -446,7 +447,7 @@
 <script>
 (function () {
   var KEY = 'ff13rta_v2';
-  var KEEP = 2; // 売却せず残すフェニックスの尾の最低数
+  var KEEP = 2; // 売却せず残すフェニックスの尾の目安 (カラヴィンカ戦・バハムート戦で1個ずつ使う)
   var C = { fixed: 20275, spica: 7250, oil: 1320, crank: 26880, shaman: 3000, potion: 1550, set: 4550, tal: 6000 };
   // 買い物前: プレミアム 7章7体+9章6体=13、クレジット 9章6体 / ブリッジ: プレミアム最大7、クレジット最大8、輝コバルト最大1 (個別の上限のみ)
   var MAXD = { prem: 13, cred: 6, rp: 7, rc: 8, rcb: 1 };
@@ -544,7 +545,7 @@
       var csA = Math.max(0, phOwned() - KEEP), rmA = csA - r.sellEff, ndA = Math.ceil((r.must - r.income) / 500);
       next = ndA <= rmA ? '→ フェニックスの尾をあと ' + ndA + ' 個売れば①に届きます'
         : rmA > 0 ? '→ フェニ尾を残り ' + rmA + ' 個全て売っても①に届きません' + ph7tip()
-        : '→ 売れるフェニ尾がなく、①に届きません (最低' + KEEP + '個は残します)' + ph7tip();
+        : '→ 売れるフェニ尾がなく、①に届きません (最低' + KEEP + '個は残す目安です)' + ph7tip();
       next += ' / 11章へは ' + sfmt(r.leftover) + ' で持ち越し';
     } else if (st === 'B') {
       cls = 'ok'; sub = '1回目の買い物で全て購入できます'; badge = '1回で完了'; bcls = 'b-ok';
@@ -617,7 +618,7 @@
     } else {
       hint9 = '売却可能 ' + canSell + ' 個。' + setTxt + '。';
     }
-    if (owned > 0 && r.sellEff > 0 && owned - r.sellEff < KEEP) hint9 += ' ⚠ 売却後の残りは ' + (owned - r.sellEff) + ' 個で、目安の最低' + KEEP + '個を下回ります。';
+    if (owned > 0 && r.sellEff > 0 && owned - r.sellEff < KEEP) hint9 += ' ⚠ 売却後の残りは ' + (owned - r.sellEff) + ' 個で、目安の最低' + KEEP + '個 (カラヴィンカ戦・バハムート戦で1個ずつ) を下回ります。';
     $('phHint').textContent = hint9;
     var phSum;
     if (r.stage0 === 'A') phSum = '⚠ ①に届きません: フェニ尾の売却が必要です';
