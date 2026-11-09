@@ -502,6 +502,7 @@
   var num = function (v) { v = parseInt(v, 10); return isNaN(v) ? 0 : Math.max(0, v); };
 
   /* ---------- 計算 ---------- */
+  PAT.forEach(function (p) { p.lab = 'ルート' + p.id.slice(1); });
   function calc9() {
     var bio = BIO[S.bio];
     var must = C.crank + bio.c;
@@ -769,7 +770,7 @@
     var cur = PAT.filter(function (p) { return p.id === S.sel; })[0];
     $('sel11').value = S.sel;
 
-    $('title11').textContent = cur.id + ' チャート';
+    $('title11').textContent = cur.lab;
     $('req11').textContent = fmt(cur.t);
     var ok = total >= cur.t;
     $('badge11').textContent = ok ? '達成可能' : '資金不足';
@@ -777,10 +778,10 @@
     $('box11').className = 'box ' + (ok ? 'ok' : 'ng');
     var idx = PAT.indexOf(cur), msg;
     if (ok) {
-      $('box11t').textContent = cur.id + ' 到達可能 (余り ' + fmt(total - cur.t) + ')';
-      msg = idx < PAT.length - 1 ? '上位 ' + PAT[idx + 1].id + ' まであと ' + fmt(PAT[idx + 1].t - total) : '最上位チャートです';
+      $('box11t').textContent = cur.lab + ' 到達可能 (余り ' + fmt(total - cur.t) + ')';
+      msg = idx < PAT.length - 1 ? '上位 ' + PAT[idx + 1].lab + ' まであと ' + fmt(PAT[idx + 1].t - total) : '最上位チャートです';
     } else {
-      $('box11t').textContent = cur.id + ' 未達';
+      $('box11t').textContent = cur.lab + ' 未達';
       msg = 'あと ' + fmt(cur.t - total) + ' 不足';
     }
     $('box11s').textContent = msg;
@@ -802,7 +803,7 @@
             : '<span class="badge ' + (p.t - total <= 3000 ? 'b-warn' : 'b-ng') + '">あと ' + (p.t - total).toLocaleString() + '</span>';
       var st = isBest ? 'st-best' : can ? 'st-ok' : (p.t - total <= 3000 ? 'st-near' : 'st-far');
       ph += '<div class="pat ' + st + (p.id === S.sel ? ' sel' : '') + '" data-pat="' + p.id + '">' +
-        '<div><b>' + p.id + '</b> <span class="note"><span style="white-space:nowrap">超伝導体' + p.cond + '</span> / ' + [['牙', p.fang], ['骨', p.bone], ['尾', p.tail], ['ゼリー', p.jelly]].filter(function (x) { return x[1] > 0; }).map(function (x) { return '<span style="white-space:nowrap">' + x[0] + x[1] + '</span>'; }).join('・') + '</span></div>' +
+        '<div><b>' + p.lab + '</b> <span class="note"><span style="white-space:nowrap">超伝導体' + p.cond + '</span> / ' + [['牙', p.fang], ['骨', p.bone], ['尾', p.tail], ['ゼリー', p.jelly]].filter(function (x) { return x[1] > 0; }).map(function (x) { return '<span style="white-space:nowrap">' + x[0] + x[1] + '</span>'; }).join('・') + '</span></div>' +
         '<div style="display:flex;gap:10px;align-items:center;"><b>' + p.t.toLocaleString() + ' G</b>' + b + '</div></div>';
     });
     $('pats').innerHTML = ph;
@@ -811,11 +812,11 @@
     PAT.forEach(function (p) {
       var need = p.t - total;
       if (need <= 0) {
-        nh += '<tr><td>' + p.id + '</td><td class="r">-</td><td class="r">到達済み</td></tr>';
+        nh += '<tr><td>' + p.lab + '</td><td class="r">-</td><td class="r">到達済み</td></tr>';
       } else {
         var pr = gainProb(need) * 100;
         var ps = pr > 0 && pr < 0.05 ? '0.1%未満' : pr.toFixed(1) + '%';
-        nh += '<tr><td>' + p.id + '</td><td class="r">' + need.toLocaleString() + ' G</td><td class="r">' + ps + '</td></tr>';
+        nh += '<tr><td>' + p.lab + '</td><td class="r">' + need.toLocaleString() + ' G</td><td class="r">' + ps + '</td></tr>';
       }
     });
     $('need11').innerHTML = nh;
@@ -853,9 +854,9 @@
       else { gc = 'ng'; gm = 'タリスマン売却でも不足'; gs = '11章へ ' + sfmt(r.leftover); }
     } else {
       var t11 = total11(), b11 = best(t11), i11 = b11 ? PAT.indexOf(b11) : -1;
-      if (!b11) { gc = 'ng'; gm = 'P1 未達'; gs = 'あと ' + fmt(PAT[0].t - t11); }
-      else if (i11 === PAT.length - 1) { gc = 'ok'; gm = b11.id + ' 到達可能'; gs = '最上位チャートです'; }
-      else { gc = 'ok'; gm = b11.id + ' 到達可能'; gs = PAT[i11 + 1].id + ' まであと ' + fmt(PAT[i11 + 1].t - t11); }
+      if (!b11) { gc = 'ng'; gm = PAT[0].lab + ' 未達'; gs = 'あと ' + fmt(PAT[0].t - t11); }
+      else if (i11 === PAT.length - 1) { gc = 'ok'; gm = b11.lab + ' 到達可能'; gs = '最上位チャートです'; }
+      else { gc = 'ok'; gm = b11.lab + ' 到達可能'; gs = PAT[i11 + 1].lab + ' まであと ' + fmt(PAT[i11 + 1].t - t11); }
     }
     gn.className = gc; gn.innerHTML = gm + '<small>' + gs + '</small>';
     $('helpText').textContent = is9 ? '買い物分岐 ｜ 9章の買い物ギルを判定' : '買い物分岐 ｜ 11章の到達チャートを判定';
@@ -867,7 +868,7 @@
   SELL.forEach(function (s, i) { sl += '<label class="chk"><input type="checkbox" data-sell="' + i + '"> ' + s[0] + ' (' + s[1].toLocaleString() + 'G)' + (i === 1 ? ' <span class="note" id="talNote"></span>' : '') + '</label>'; });
   $('sellList').innerHTML = sl;
   var so = '';
-  PAT.forEach(function (p) { so += '<option value="' + p.id + '">' + p.id + ' (' + p.t.toLocaleString() + ' Gil)</option>'; });
+  PAT.forEach(function (p) { so += '<option value="' + p.id + '">' + p.lab + ' (' + p.t.toLocaleString() + ' Gil)</option>'; });
   $('sel11').innerHTML = so;
 
   /* ---------- イベント ---------- */
