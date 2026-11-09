@@ -610,6 +610,7 @@
       var inc0 = r.target - r.shortSet;
       var nT = Math.ceil(Math.max(0, r.short0) / 500), nP = Math.ceil(Math.max(0, r.shortSet) / 500);
       var okT = nT <= cs, okP = nP <= cs;
+      if (!okP) { el.innerHTML = ''; return; } // Bが選べないときは選択カード自体を出さない
       var lT = inc0 + nT * 500 - r.target + C.tal, lP = inc0 + nP * 500 - r.target;
       var actP = r.stage === 'B' && r.sellEff > 0, actT = !actP;
       function card(cl, act, ttl, ok, lines, val, btn) {
