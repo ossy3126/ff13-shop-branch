@@ -633,7 +633,7 @@
         S.spica = on; var q = calc9(); S.spica = keep;
         return (on ? '回収あり' : '回収なし') + ': ' + lab[q.stage] + ' (11章へ ' + sfmt(q.leftover) + ')';
       }
-      $('spicaHint').innerHTML = line(false) + '<br>' + line(true);
+      $('spicaHint').innerHTML = keep ? line(true) : ''; // チェックが入っているときだけ判定を出す
     })();
     var box = $('oil9'), t, s, left;
     if (st === 'A') {
