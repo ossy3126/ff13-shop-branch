@@ -318,6 +318,8 @@
 
       <div id="meter9"></div>
 
+      <div id="route9"></div>
+
       <div id="oil9" class="box warn tip">
         <div id="oil9t" style="font-weight:800;font-size:14px;margin-bottom:2px;"></div>
         <div id="oil9s" style="font-size:13px;line-height:1.6;"></div>
@@ -570,14 +572,10 @@
       main = '+' + fmt(r.diff); next = '→ 11章へ持ち越し: ' + fmt(r.leftover);
     } else if (st === 'C') {
       cls = 'warn'; sub = '1回目では足りません → 9章2回目の買い物が必要'; badge = '2回買い物'; bcls = 'b-ng';
-      var remC = Math.max(0, phOwned() - KEEP - r.sellEff), needB = Math.ceil(-r.diff / 500);
-      main = '−' + fmt(r.diff); next = '→ 魔神のタリスマン (+6,000G) を売って補填 / 11章へ持ち越し: ' + fmt(r.leftover) +
-        (needB <= remC ? ' ／ または、フェニ尾をあと ' + needB + ' 個売れば1回目で完了' : '');
+      main = '−' + fmt(r.diff); next = '→ 魔神のタリスマン (+6,000G) を売って補填 / 11章へ持ち越し: ' + fmt(r.leftover);
     } else {
       cls = 'ng'; sub = '魔神のタリスマンを売却しても足りません'; badge = '不足'; bcls = 'b-ng';
-      var remD = Math.max(0, phOwned() - KEEP - r.sellEff), needBd = Math.ceil(-r.diff / 500), needCd = Math.ceil(-(r.diff + C.tal) / 500);
-      main = '−' + fmt(r.diff + C.tal); next = '→ タリスマン売却後も不足 / 11章へは ' + sfmt(r.leftover) + ' で持ち越し' +
-        (needBd <= remD ? ' ／ フェニ尾をあと ' + needBd + ' 個売れば1回目で完了' : needCd <= remD ? ' ／ フェニ尾をあと ' + needCd + ' 個売ればタリスマン売却で足ります' : ' (選択購入を減らすかオイル回収を検討)');
+      main = '−' + fmt(r.diff + C.tal); next = '→ タリスマン売却後も不足 / 11章へは ' + sfmt(r.leftover) + ' で持ち越し (選択購入を減らすかオイル回収を検討)';
     }
     $('st9').className = 'box ' + cls;
     $('st9sub').textContent = sub;
@@ -597,10 +595,6 @@
       first: '<span class="badge b-ok">1回目で購入</span>', second: '<span class="badge b-warn">2回目へ</span>' }[when];
     var c2 = '<div class="step ' + cls2 + (S.set ? '' : ' mute') + '"><div class="step-h"><b>② ' + (when === 'second' ? '2回目' : 'セット') + '</b>' + bd2 + '</div>';
     if (r.talSold) c2 += '<div class="row"><span>魔神のタリスマン売却</span><b class="gold">+' + C.tal.toLocaleString() + ' Gil</b></div>';
-    if (when === 'second') {
-      var remS = Math.max(0, phOwned() - KEEP - r.sellEff), needS = Math.ceil(-r.diff / 500);
-      if (needS <= remS) c2 += '<div class="row"><span class="note">または フェニ尾をあと ' + needS + ' 個売れば1回目で購入</span><b class="gold">+' + (needS * 500).toLocaleString() + ' Gil</b></div>';
-    }
     c2 += '<div class="row"><span>シャーマンサインx1 + ポーションx31</span><span>' + fmt(C.set) + '</span></div>';
     if (S.set && !A) c2 += '<div class="row tot"><span class="note">' + (when === 'first' ? '① 後の余りで買えます' : '① 後の余りでは足りません') + '</span><b>' + (r.leftover >= 0 && r.stage !== 'D' ? '余り ' + fmt(r.leftover) : '不足 ' + fmt(r.diff + C.tal)) + '</b></div>';
     c2 += '</div>';
@@ -609,6 +603,29 @@
       return (k === 'hone' ? '骨37' : '牙39') + ' ①後 ' + (x < 0 ? '−' : '') + fmt(x) + (x < 0 ? ' (不足)' : x >= C.set ? ' → 1回目で完了' : ' → 2回目へ');
     });
     $('plan9').innerHTML = '<div class="steps">' + c1 + c2 + '</div>' + (S.set ? '<div class="note" style="margin:-4px 0 12px;">' + alt.join(' ／ ') + '</div>' : '');
+
+    (function () {
+      var ow = phOwned(), cs = Math.max(0, ow - KEEP), el = $('route9');
+      if (r.stage0 === 'B' || ow <= 0) { el.innerHTML = ''; return; }
+      var inc0 = r.target - r.shortSet;
+      var nT = Math.ceil(Math.max(0, r.short0) / 500), nP = Math.ceil(Math.max(0, r.shortSet) / 500);
+      var okT = nT <= cs, okP = nP <= cs;
+      var lT = inc0 + nT * 500 - r.target + C.tal, lP = inc0 + nP * 500 - r.target;
+      var actP = r.stage === 'B' && r.sellEff > 0, actT = !actP;
+      function card(cl, act, ttl, ok, lines, val, btn) {
+        return '<div class="step ' + cl + '" style="' + (act ? 'outline:2px solid currentColor;' : 'opacity:.8;') + '"><div class="step-h"><b>' + ttl + '</b>' +
+          (act ? '<span class="badge b-ok">選択中</span>' : '') + '</div>' + lines +
+          '<div class="row tot"><span class="note">' + (ok ? '11章へ持ち越し' : '届きません') + '</span><b class="' + (ok && val >= 0 ? 'gold' : 'neg') + '">' + (ok ? sfmt(val) : '—') + '</b></div>' +
+          (ok && !act ? '<button type="button" class="sbtn" style="margin-top:6px;width:100%;" data-set="phoenixSell:' + btn + '">この案にする</button>' : '') + '</div>';
+      }
+      var lnT = '<div class="row"><span>2回目の買い物 魔神のタリスマン</span><b class="gold">+' + C.tal.toLocaleString() + ' Gil</b></div>' +
+        '<div class="row"><span>フェニ尾売却 (①のため)</span><span>' + (nT > 0 ? nT + ' 個' : 'なし') + '</span></div>';
+      var lnP = '<div class="row"><span>フェニ尾売却</span><span>' + nP + ' 個 (+' + (nP * 500).toLocaleString() + ' Gil)</span></div>' +
+        '<div class="row"><span>残りフェニ尾</span><span>' + (ow - nP) + ' 個' + (ow - nP < KEEP ? ' ⚠' : '') + '</span></div>';
+      el.innerHTML = '<div class="note" style="margin:4px 0;"><b>1回目で足りないときの選択</b></div><div class="steps">' +
+        card('warn', actT, 'A. 2回目の買い物', okT, lnT, lT, nT) +
+        card('ok', actP, 'B. フェニ尾で1回目に完了', okP, lnP, lP, nP) + '</div>';
+    })();
 
     var tal = r.talSold ? C.tal : 0;
     var scale = Math.max(r.target, r.income + tal, 1);
