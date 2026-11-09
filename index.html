@@ -323,6 +323,7 @@
       <div id="oil9" class="box warn tip">
         <div id="oil9t" style="font-weight:800;font-size:14px;margin-bottom:2px;"></div>
         <div id="oil9s" style="font-size:13px;line-height:1.6;"></div>
+        <div id="oil9p" style="font-size:13px;line-height:1.6;margin-top:4px;"></div>
       </div>
 
       <div id="plan9"></div>
@@ -714,6 +715,18 @@
       s = 'あと ' + fmt(left) + ' 不足。' + hint;
     }
     $('oil9t').textContent = t; $('oil9s').textContent = s;
+    (function () {
+      // フェニ尾の個数も踏まえた、オイル回収の有無ごとの「1回目で完了できるか」
+      var base0 = C.fixed + S.base9 + S.cred * 500 + S.prem * 2500 + (S.spica ? C.spica : 0);
+      var cs = Math.max(0, phOwned() - KEEP);
+      var nN = Math.ceil(Math.max(0, r.target - base0) / 500), nO = Math.ceil(Math.max(0, r.target - base0 - C.oil) / 500);
+      function w(n) { return n === 0 ? '売却不要で1回目に完了' : n <= cs ? 'フェニ尾' + n + '個売却で1回目に完了' : '1回目は不足 (2回目の買い物)'; }
+      var el = $('oil9p');
+      if (nN === 0) { el.textContent = ''; return; }
+      var msg = 'フェニ尾 (売却可能 ' + cs + ' 個) で比較 → オイルなし: ' + w(nN) + ' ／ オイルあり: ' + w(nO) + '。';
+      if (nO < nN && (nO <= cs)) msg += (nN > cs ? ' オイルを回収すれば2回目の買い物を省略できます。' : ' オイルを回収すればフェニ尾の売却を ' + (nN - nO) + ' 個減らせます。');
+      el.textContent = msg;
+    })();
   }
 
   // ブリッジ1・2のドロップで増えるギルの分布 (1体につき レア→通常 の順に判定、1体1個まで)
