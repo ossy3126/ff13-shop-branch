@@ -742,7 +742,7 @@
             : can ? '<span class="badge b-ok">可能</span>'
             : '<span class="badge b-ng">あと ' + (p.t - total).toLocaleString() + '</span>';
       ph += '<div class="pat' + (p.id === S.sel ? ' sel' : '') + '" data-pat="' + p.id + '">' +
-        '<div><b>' + p.id + '</b> <span class="note"><span style="white-space:nowrap">超伝導体' + p.cond + '</span> ・ ' + [['牙', p.fang], ['骨', p.bone], ['尾', p.tail], ['ゼリー', p.jelly]].filter(function (x) { return x[1] > 0; }).map(function (x) { return '<span style="white-space:nowrap">' + x[0] + x[1] + '</span>'; }).join('・') + '</span></div>' +
+        '<div><b>' + p.id + '</b> <span class="note"><span style="white-space:nowrap">超伝導体' + p.cond + '</span> / ' + [['牙', p.fang], ['骨', p.bone], ['尾', p.tail], ['ゼリー', p.jelly]].filter(function (x) { return x[1] > 0; }).map(function (x) { return '<span style="white-space:nowrap">' + x[0] + x[1] + '</span>'; }).join('・') + '</span></div>' +
         '<div style="display:flex;gap:10px;align-items:center;"><b>' + p.t.toLocaleString() + ' G</b>' + b + '</div></div>';
     });
     $('pats').innerHTML = ph;
