@@ -722,7 +722,7 @@
       var nN = Math.ceil(Math.max(0, r.target - base0) / 500), nO = Math.ceil(Math.max(0, r.target - base0 - C.oil) / 500);
       function w(n) { return n === 0 ? '売却不要で1回目に完了' : n <= cs ? 'フェニ尾' + n + '個売却で1回目に完了' : '1回目は不足 (2回目の買い物)'; }
       var el = $('oil9p');
-      if (nN === 0) { el.textContent = ''; return; }
+      if (nN === 0 || nO > cs) { el.textContent = ''; return; } // 不要、またはオイルありでも1回目で終わらないときは出さない
       var msg = 'フェニ尾 (売却可能 ' + cs + ' 個) で比較 → オイルなし: ' + w(nN) + ' ／ オイルあり: ' + w(nO) + '。';
       if (nO < nN && (nO <= cs)) msg += (nN > cs ? ' オイルを回収すれば2回目の買い物を省略できます。' : ' オイルを回収すればフェニ尾の売却を ' + (nN - nO) + ' 個減らせます。');
       el.textContent = msg;
