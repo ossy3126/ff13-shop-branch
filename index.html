@@ -143,6 +143,15 @@
   .pat > div:first-child { flex: 0 0 50%; color: #121212; }
   .pat > div:first-child .note { color: #3a3a3a; }
   .pat.sel { background: linear-gradient(100deg, #ffffff 0%, #bcd0ee 52%, #000 52.4%, #000 100%); box-shadow: 0 0 0 1px #fff; }
+  /* 状態の色: 最高到達=金 / 届く=緑 / 惜しい(あと3,000G以内)=黄 / 遠い=赤 */
+  .pat.st-best { background: linear-gradient(100deg, #f6dd8c 0%, #c79a2e 52%, #000 52.4%, #000 100%); }
+  .pat.st-ok   { background: linear-gradient(100deg, #b9ecd6 0%, #45a07f 52%, #000 52.4%, #000 100%); }
+  .pat.st-near { background: linear-gradient(100deg, #f0e2a0 0%, #b89a3e 52%, #000 52.4%, #000 100%); }
+  .pat.st-far  { background: linear-gradient(100deg, #e9bcc7 0%, #a5576c 52%, #000 52.4%, #000 100%); }
+  .pat.sel.st-best { background: linear-gradient(100deg, #fff3c4 0%, #ecc65a 52%, #000 52.4%, #000 100%); }
+  .pat.sel.st-ok   { background: linear-gradient(100deg, #eafff6 0%, #86d6b6 52%, #000 52.4%, #000 100%); }
+  .pat.sel.st-near { background: linear-gradient(100deg, #fff8d6 0%, #dcc468 52%, #000 52.4%, #000 100%); }
+  .pat.sel.st-far  { background: linear-gradient(100deg, #ffe6ec 0%, #dc8ea4 52%, #000 52.4%, #000 100%); }
   .pat.sel::before { content: "☞"; position: absolute; left: 8px; top: 50%; transform: translateY(-52%); font-size: 19px; color: #fff; text-shadow: 0 0 2px #000, 0 0 2px #000, 0 0 3px #000; }
   .pat > div:last-child { flex: 1; justify-content: flex-end; }
 
@@ -746,8 +755,9 @@
       var can = total >= p.t, isBest = top && top.id === p.id;
       var b = isBest ? '<span class="badge b-best">最高到達</span>'
             : can ? '<span class="badge b-ok">可能</span>'
-            : '<span class="badge b-ng">あと ' + (p.t - total).toLocaleString() + '</span>';
-      ph += '<div class="pat' + (p.id === S.sel ? ' sel' : '') + '" data-pat="' + p.id + '">' +
+            : '<span class="badge ' + (p.t - total <= 3000 ? 'b-warn' : 'b-ng') + '">あと ' + (p.t - total).toLocaleString() + '</span>';
+      var st = isBest ? 'st-best' : can ? 'st-ok' : (p.t - total <= 3000 ? 'st-near' : 'st-far');
+      ph += '<div class="pat ' + st + (p.id === S.sel ? ' sel' : '') + '" data-pat="' + p.id + '">' +
         '<div><b>' + p.id + '</b> <span class="note"><span style="white-space:nowrap">超伝導体' + p.cond + '</span> / ' + [['牙', p.fang], ['骨', p.bone], ['尾', p.tail], ['ゼリー', p.jelly]].filter(function (x) { return x[1] > 0; }).map(function (x) { return '<span style="white-space:nowrap">' + x[0] + x[1] + '</span>'; }).join('・') + '</span></div>' +
         '<div style="display:flex;gap:10px;align-items:center;"><b>' + p.t.toLocaleString() + ' G</b>' + b + '</div></div>';
     });
