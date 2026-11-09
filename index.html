@@ -525,7 +525,7 @@
   }
 
   /* ---------- 描画 ---------- */
-  var prevA9 = false;
+  var prevA9 = false, prevB9 = false;
   function render9() {
     var r = calc9(), st = r.stage;
     $('out9bioN').textContent = r.bio.n; $('out9bioC').textContent = fmt(r.bio.c);
@@ -629,6 +629,9 @@
     $('phNote').style.display = r.stage0 === 'A' ? 'none' : '';
     if (r.stage0 === 'A' && !prevA9) $('phFold').open = true;
     prevA9 = r.stage0 === 'A';
+    // フェニ尾の売却が不要と確定したら (売らなくても①②とも1回目で買える)、自動で閉じる
+    if (r.stage0 === 'B' && !prevB9) $('phFold').open = false;
+    prevB9 = r.stage0 === 'B';
 
     (function () {
       var keep = S.spica, lab = { A: '①に届かない', B: '1回目で完了', C: '2回目の買い物が必要', D: 'タリスマン売却でも不足' };
