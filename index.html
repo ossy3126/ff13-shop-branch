@@ -570,10 +570,14 @@
       main = '+' + fmt(r.diff); next = '→ 11章へ持ち越し: ' + fmt(r.leftover);
     } else if (st === 'C') {
       cls = 'warn'; sub = '1回目では足りません → 9章2回目の買い物が必要'; badge = '2回買い物'; bcls = 'b-ng';
-      main = '−' + fmt(r.diff); next = '→ 魔神のタリスマン (+6,000G) を売って補填 / 11章へ持ち越し: ' + fmt(r.leftover);
+      var remC = Math.max(0, phOwned() - KEEP - r.sellEff), needB = Math.ceil(-r.diff / 500);
+      main = '−' + fmt(r.diff); next = '→ 魔神のタリスマン (+6,000G) を売って補填 / 11章へ持ち越し: ' + fmt(r.leftover) +
+        (needB <= remC ? ' ／ または、フェニ尾をあと ' + needB + ' 個売れば1回目で完了' : '');
     } else {
       cls = 'ng'; sub = '魔神のタリスマンを売却しても足りません'; badge = '不足'; bcls = 'b-ng';
-      main = '−' + fmt(r.diff + C.tal); next = '→ タリスマン売却後も不足 (選択購入を減らすかオイル回収を検討) / 11章へは ' + sfmt(r.leftover) + ' で持ち越し';
+      var remD = Math.max(0, phOwned() - KEEP - r.sellEff), needBd = Math.ceil(-r.diff / 500), needCd = Math.ceil(-(r.diff + C.tal) / 500);
+      main = '−' + fmt(r.diff + C.tal); next = '→ タリスマン売却後も不足 / 11章へは ' + sfmt(r.leftover) + ' で持ち越し' +
+        (needBd <= remD ? ' ／ フェニ尾をあと ' + needBd + ' 個売れば1回目で完了' : needCd <= remD ? ' ／ フェニ尾をあと ' + needCd + ' 個売ればタリスマン売却で足ります' : ' (選択購入を減らすかオイル回収を検討)');
     }
     $('st9').className = 'box ' + cls;
     $('st9sub').textContent = sub;
@@ -593,6 +597,10 @@
       first: '<span class="badge b-ok">1回目で購入</span>', second: '<span class="badge b-warn">2回目へ</span>' }[when];
     var c2 = '<div class="step ' + cls2 + (S.set ? '' : ' mute') + '"><div class="step-h"><b>② ' + (when === 'second' ? '2回目' : 'セット') + '</b>' + bd2 + '</div>';
     if (r.talSold) c2 += '<div class="row"><span>魔神のタリスマン売却</span><b class="gold">+' + C.tal.toLocaleString() + ' Gil</b></div>';
+    if (when === 'second') {
+      var remS = Math.max(0, phOwned() - KEEP - r.sellEff), needS = Math.ceil(-r.diff / 500);
+      if (needS <= remS) c2 += '<div class="row"><span class="note">または フェニ尾をあと ' + needS + ' 個売れば1回目で購入</span><b class="gold">+' + (needS * 500).toLocaleString() + ' Gil</b></div>';
+    }
     c2 += '<div class="row"><span>シャーマンサインx1 + ポーションx31</span><span>' + fmt(C.set) + '</span></div>';
     if (S.set && !A) c2 += '<div class="row tot"><span class="note">' + (when === 'first' ? '① 後の余りで買えます' : '① 後の余りでは足りません') + '</span><b>' + (r.leftover >= 0 && r.stage !== 'D' ? '余り ' + fmt(r.leftover) : '不足 ' + fmt(r.diff + C.tal)) + '</b></div>';
     c2 += '</div>';
