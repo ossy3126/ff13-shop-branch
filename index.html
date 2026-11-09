@@ -259,6 +259,8 @@
           <div class="stepper"><button class="sbtn" data-add="prem:-1">−</button><input type="number" inputmode="numeric" data-bind="prem" min="0" max="13"><button class="sbtn" data-add="prem:1">＋</button><button class="sbtn" data-set="prem:0" style="font-size:12px;" title="0個にする">0</button></div></div>
       </div>
       <label class="opt" style="margin:6px 0 4px;"><span>シリコンオイル回収 (+1,320G)</span><input type="checkbox" data-chk="oil"></label>
+      <label class="opt" style="margin:4px 0 4px;"><span>スピカ回収・売却 (+7,250G / 9章1回目の買い物)</span><input type="checkbox" data-chk="spica"></label>
+      <div class="note" id="spicaHint" style="margin:0 0 8px;line-height:1.6;"></div>
       <details class="fold" id="phFold"><summary id="phSum"></summary>
         <div class="note" id="phNote" style="margin:2px 0 8px;">フェニックスの尾の売却は、足りないときだけ使う手段です。通常は売却数を0のままにしてください。</div>
         <div class="grid" style="margin-bottom:4px;">
@@ -315,6 +317,7 @@
           <div class="row head"><span>所持金・売却額</span><span id="in9tot"></span></div>
           <div class="row"><b>確定売却 (固定)</b><b>20,275 Gil</b></div>
           <div class="row"><span>シリコンオイルx4</span><span id="in9oil"></span></div>
+          <div class="row"><span>スピカ売却</span><span id="in9spica"></span></div>
           <div class="row"><span>所持ギル</span><span id="in9base"></span></div>
           <div class="row"><span>チップ・フェニ尾売却</span><span id="in9drop"></span></div>
         </div>
@@ -444,7 +447,7 @@
 (function () {
   var KEY = 'ff13rta_v2';
   var KEEP = 2; // 売却せず残すフェニックスの尾の最低数
-  var C = { fixed: 20275, oil: 1320, crank: 26880, shaman: 3000, potion: 1550, set: 4550, tal: 6000 };
+  var C = { fixed: 20275, spica: 7250, oil: 1320, crank: 26880, shaman: 3000, potion: 1550, set: 4550, tal: 6000 };
   // 買い物前: プレミアム 7章7体+9章6体=13、クレジット 9章6体 / ブリッジ: プレミアム最大7、クレジット最大8、輝コバルト最大1 (個別の上限のみ)
   var MAXD = { prem: 13, cred: 6, rp: 7, rc: 8, rcb: 1 };
   var BIO = { hone: { n: '極太の骨x37', c: 2960 }, kiba: { n: '呪われた牙x39', c: 3120 } };
@@ -461,7 +464,7 @@
     { id: 'P8', t: 126180, cond: 94, fang: 81, bone: 81, tail: 81, jelly: 41 }
   ];
   function defaults() {
-    return { tab: '9', bio: 'hone', oil: false, set: true, ph7a: false, ph9a: false,
+    return { tab: '9', bio: 'hone', oil: false, spica: false, set: true, ph7a: false, ph9a: false,
       base9: 5000, cred: 0, prem: 0, phoenix: 0, phoenixSell: 0,
       link: true, base11: 0, sell: [1,1,1,1,1,1], rc: 0, rp: 0, rcb: 0, auto: true, sel: 'P1' };
   }
@@ -484,7 +487,7 @@
     var target = must + (S.set ? C.set : 0);
     function ev(sell) {
       var drop = S.cred * 500 + S.prem * 2500 + sell * 500;
-      var noOil = C.fixed + S.base9 + drop;
+      var noOil = C.fixed + S.base9 + drop + (S.spica ? C.spica : 0);
       var income = noOil + (S.oil ? C.oil : 0);
       var diff = income - target;
       var stage = income < must ? 'A' : diff >= 0 ? 'B' : (diff + C.tal >= 0 ? 'C' : 'D');
@@ -528,6 +531,7 @@
     $('out9set').textContent = S.set ? fmt(C.set) : '0 Gil';
     $('row9set').classList.toggle('off', !S.set);
     $('out9tot').textContent = fmt(r.target);
+    $('in9spica').textContent = '+' + (S.spica ? C.spica : 0).toLocaleString() + ' Gil';
     $('in9oil').textContent = '+' + (S.oil ? C.oil : 0).toLocaleString() + ' Gil';
     $('in9base').textContent = '+' + S.base9.toLocaleString() + ' Gil';
     $('in9drop').textContent = '+' + r.drop.toLocaleString() + ' Gil';
@@ -623,6 +627,14 @@
     if (r.stage0 === 'A' && !prevA9) $('phFold').open = true;
     prevA9 = r.stage0 === 'A';
 
+    (function () {
+      var keep = S.spica, lab = { A: '①に届かない', B: '1回目で完了', C: '2回目の買い物が必要', D: 'タリスマン売却でも不足' };
+      function line(on) {
+        S.spica = on; var q = calc9(); S.spica = keep;
+        return (on ? '回収あり' : '回収なし') + ': ' + lab[q.stage] + ' (11章へ ' + sfmt(q.leftover) + ')';
+      }
+      $('spicaHint').innerHTML = line(false) + '<br>' + line(true);
+    })();
     var box = $('oil9'), t, s, left;
     if (st === 'A') {
       if ((r.income - r.must + (S.oil ? 0 : C.oil)) >= 0) {
