@@ -382,14 +382,14 @@
         <div id="linkNote" class="note" style="margin-bottom:8px;"></div>
         <input type="number" inputmode="numeric" data-bind="base11" step="10" id="base11">
 
-        <div class="quick">
+        <div class="quick" style="grid-template-columns:repeat(3,1fr);">
           <button class="q" data-gil="500">+500</button>
           <button class="q" data-gil="2500">+2.5k</button>
           <button class="q" data-gil="10000">+10k</button>
-          <button class="q" data-gil="0">0に戻す</button>
           <button class="q m" data-gil="-500">−500</button>
           <button class="q m" data-gil="-2500">−2.5k</button>
           <button class="q m" data-gil="-10000">−10k</button>
+          <button class="q" data-gil="0" style="grid-column:span 3;">0に戻す</button>
         </div>
 
         <div class="sec">固定売却アイテム</div>
