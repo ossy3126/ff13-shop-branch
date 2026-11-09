@@ -282,7 +282,7 @@
       <div class="sec" style="margin-top:16px;">購入設定</div>
       <div class="grid" style="margin-bottom:12px;">
         <div>
-          <span class="lbl">生体素材 (どちらか固定)</span>
+          <span class="lbl">極太の骨 / 呪われた牙 (どちらか固定)</span>
           <div class="seg" id="bioSeg">
             <button data-bio="hone">骨37 (2,960G)</button>
             <button data-bio="kiba">牙39 (3,120G)</button>
@@ -540,7 +540,7 @@
 
     var cls, sub, badge, bcls, main, next;
     if (st === 'A') {
-      cls = 'ng'; sub = '1回目の必須購入 (クランク軸+生体素材) に届いていません'; badge = '必須不足'; bcls = 'b-ng';
+      cls = 'ng'; sub = '1回目の必須購入 (クランク軸+骨または牙) に届いていません'; badge = '必須不足'; bcls = 'b-ng';
       main = '−' + fmt(r.income - r.must);
       var csA = Math.max(0, phOwned() - KEEP), rmA = csA - r.sellEff, ndA = Math.ceil((r.must - r.income) / 500);
       next = ndA <= rmA ? '→ フェニックスの尾をあと ' + ndA + ' 個売れば①に届きます'
@@ -742,7 +742,7 @@
             : can ? '<span class="badge b-ok">可能</span>'
             : '<span class="badge b-ng">あと ' + (p.t - total).toLocaleString() + '</span>';
       ph += '<div class="pat' + (p.id === S.sel ? ' sel' : '') + '" data-pat="' + p.id + '">' +
-        '<div><b>' + p.id + '</b> <span class="note">超伝導体 ' + p.cond + ' / 生体 ' + (p.fang + p.bone + p.tail + p.jelly) + '</span></div>' +
+        '<div><b>' + p.id + '</b> <span class="note"><span style="white-space:nowrap">超伝導体' + p.cond + '</span> ・ ' + [['牙', p.fang], ['骨', p.bone], ['尾', p.tail], ['ゼリー', p.jelly]].filter(function (x) { return x[1] > 0; }).map(function (x) { return '<span style="white-space:nowrap">' + x[0] + x[1] + '</span>'; }).join('・') + '</span></div>' +
         '<div style="display:flex;gap:10px;align-items:center;"><b>' + p.t.toLocaleString() + ' G</b>' + b + '</div></div>';
     });
     $('pats').innerHTML = ph;
