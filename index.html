@@ -178,6 +178,9 @@
   .box { transition: background .2s, border-color .2s; }
   .box.tip { padding: 10px 12px; margin-bottom: 12px; }
   .box.tip #oil9t, #oil9t { font-size: 15px !important; }
+  .box.compact { padding: 8px 14px; }
+  .box.compact #oil9t { font-size: 13px !important; font-weight: 600; margin: 0 !important; }
+  #oil9s:empty { display: none; }
   .big { font-size: 34px; }
   .gold { color: #ffd37a; } .neg { color: var(--ng); }
   .b-warn { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-bd); }
@@ -665,8 +668,8 @@
         s = '回収してもあと ' + fmt(r.income - r.must + (S.oil ? 0 : C.oil)) + ' 不足です。';
       }
     } else if (r.dNo >= 0) {
-      box.className = 'box ok'; t = 'シリコンオイル: 回収不要';
-      s = 'オイルなしで1回目に全て買えて ' + fmt(r.dNo) + ' 余ります。';
+      box.className = 'box ok compact'; t = 'シリコンオイル: 回収不要 (オイルなしで1回目に全て買えて ' + fmt(r.dNo) + ' 余ります)';
+      s = '';
     } else if (r.dWith >= 0) {
       box.className = 'box warn'; t = 'シリコンオイル: 回収すれば2回目の買い物を省略できる';
       s = '回収すると1回目で全て買えて ' + fmt(r.dWith) + ' 余ります。回収しない場合は、タリスマン売却+2回目の買い物で ' + fmt(r.dNo + C.tal) + ' 余ります。';
