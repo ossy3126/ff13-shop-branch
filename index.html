@@ -240,6 +240,7 @@
   <div class="helpbar"><span class="helplogo">FF13</span><span id="helpText"></span></div>
   <div class="tabs">
     <button class="tab on" data-tab="9">9章</button>
+    <button class="tab" data-tab="9m">9章（医術改造）</button>
     <button class="tab" data-tab="11">11章</button>
   </div>
 
@@ -247,8 +248,8 @@
   <div id="pane9" class="pane on">
     <div class="split">
     <div class="card">
-      <h1>9章 買い物・オイル回収分岐</h1>
-      <div class="note">確定売却額 20,275 Gil ベース</div>
+      <h1 id="h9">9章 買い物・オイル回収分岐</h1>
+      <div class="note" id="fix9Note">確定売却額 20,275 Gil ベース</div>
 
       <div style="margin-top:12px;">
         <span class="lbl">所持ギル (ゲーム画面の所持金・7章 買い物終了時は最低 5,000G)</span>
@@ -265,7 +266,7 @@
         </div>
       </div>
 
-      <label class="opt" style="margin:12px 0 4px;"><span>スピカ回収・売却 (+7,250G / 9章1回目の買い物)</span><input type="checkbox" data-chk="spica"></label>
+      <label class="opt" style="margin:12px 0 4px;"><span id="spicaLbl">スピカ回収・売却 (+7,250G / 9章1回目の買い物)</span><input type="checkbox" data-chk="spica"></label>
       <div class="note" id="spicaHint" style="margin:0 0 8px;line-height:1.6;"></div>
       <div class="sec secbtn" style="margin-top:16px;"><span>ドロップ</span><button class="link reset" data-reset="1">全部リセット</button></div>
       <div class="grid" style="margin-bottom:4px;">
@@ -334,6 +335,7 @@
         <div class="sub">
           <div class="row head"><span>所持金・売却額</span><span id="in9tot"></span></div>
           <div class="row"><b>確定売却 (固定)</b><b>20,275 Gil</b></div>
+          <div class="row" id="row9kaima"><span>怪魔の翼x9 (医術改造用に売らない)</span><span>−1,350 Gil</span></div>
           <div class="row"><span>シリコンオイルx4</span><span id="in9oil"></span></div>
           <div class="row"><span>スピカ売却</span><span id="in9spica"></span></div>
           <div class="row"><span>所持ギル</span><span id="in9base"></span></div>
@@ -468,7 +470,7 @@
 (function () {
   var KEY = 'ff13rta_v2';
   var KEEP = 2; // 売却せず残すフェニックスの尾の目安 (カラヴィンカ戦・バハムート戦で1個ずつ使う)
-  var C = { fixed: 20275, spica: 7250, oil: 1320, crank: 26880, shaman: 3000, potion: 1550, set: 4550, tal: 6000 };
+  var C = { fixed: 20275, spica: 7250, oil: 1320, crank: 26880, shaman: 3000, potion: 1550, set: 4550, tal: 6000, kaima: 1350 };
   // 買い物前: プレミアム 7章7体+9章6体=13、クレジット 9章6体 / ブリッジ: プレミアム最大7、クレジット最大8、輝コバルト最大1 (個別の上限のみ)
   var MAXD = { prem: 13, cred: 6, rp: 7, rc: 8, rcb: 1 };
   var BIO = { hone: { n: '極太の骨x37', c: 2960 }, kiba: { n: '呪われた牙x39', c: 3120 } };
@@ -485,7 +487,7 @@
     { id: 'P8', t: 126180, cond: 94, fang: 81, bone: 81, tail: 81, jelly: 41 }
   ];
   function defaults() {
-    return { tab: '9', bio: 'hone', oil: false, spica: false, set: true, ph7a: false, ph9a: false,
+    return { tab: '9', m9: false, bio: 'hone', oil: false, spica: false, set: true, ph7a: false, ph9a: false,
       base9: 5000, cred: 0, prem: 0, phoenix: 0, phoenixSell: 0,
       link: true, base11: 0, sell: [1,1,1,1,1,1], rc: 0, rp: 0, rcb: 0, auto: true, sel: 'P1' };
   }
@@ -503,13 +505,17 @@
 
   /* ---------- 計算 ---------- */
   PAT.forEach(function (p) { p.lab = 'ルート' + p.id.slice(1); });
+  // 9章（医術改造）タブはスピカ回収が確定
+  function spicaOn() { return S.m9 || !!S.spica; }
+  // 9章（医術改造）タブ：怪魔の翼x9を売らないので確定売却額から引く
+  function fixed9() { return C.fixed - (S.m9 ? C.kaima : 0); }
   function calc9() {
     var bio = BIO[S.bio];
     var must = C.crank + bio.c;
     var target = must + (S.set ? C.set : 0);
     function ev(sell) {
       var drop = S.cred * 500 + S.prem * 2500 + sell * 500;
-      var noOil = C.fixed + S.base9 + drop + (S.spica ? C.spica : 0);
+      var noOil = fixed9() + S.base9 + drop + (spicaOn() ? C.spica : 0);
       var income = noOil + (S.oil ? C.oil : 0);
       var diff = income - target;
       var stage = income < must ? 'A' : diff >= 0 ? 'B' : (diff + C.tal >= 0 ? 'C' : 'D');
@@ -553,7 +559,7 @@
     $('out9set').textContent = S.set ? fmt(C.set) : '0 Gil';
     $('row9set').classList.toggle('off', !S.set);
     $('out9tot').textContent = fmt(r.target);
-    $('in9spica').textContent = '+' + (S.spica ? C.spica : 0).toLocaleString() + ' Gil';
+    $('in9spica').textContent = '+' + (spicaOn() ? C.spica : 0).toLocaleString() + ' Gil';
     $('in9oil').textContent = '+' + (S.oil ? C.oil : 0).toLocaleString() + ' Gil';
     $('in9base').textContent = '+' + S.base9.toLocaleString() + ' Gil';
     $('in9drop').textContent = '+' + r.drop.toLocaleString() + ' Gil';
@@ -680,12 +686,12 @@
     prevB9 = r.stage0 === 'B';
 
     (function () {
-      var keep = S.spica, lab = { A: '①に届かない', B: '1回目で完了', C: '2回目の買い物が必要', D: 'タリスマン売却でも不足' };
+      var keep = S.spica, shown = spicaOn(), lab = { A: '①に届かない', B: '1回目で完了', C: '2回目の買い物が必要', D: 'タリスマン売却でも不足' };
       function line(on) {
         S.spica = on; var q = calc9(); S.spica = keep;
         return (on ? '回収あり' : '回収なし') + ': ' + lab[q.stage] + ' (11章へ ' + sfmt(q.leftover) + ')';
       }
-      $('spicaHint').innerHTML = keep ? line(true) : ''; // チェックが入っているときだけ判定を出す
+      $('spicaHint').innerHTML = shown ? line(true) : ''; // チェックが入っているときだけ判定を出す
     })();
     var box = $('oil9'), t, s, left;
     if (st === 'A') {
@@ -718,7 +724,7 @@
     $('oil9t').textContent = t; $('oil9s').textContent = s;
     (function () {
       // フェニ尾の個数も踏まえた、オイル回収の有無ごとの「1回目で完了できるか」
-      var base0 = C.fixed + S.base9 + S.cred * 500 + S.prem * 2500 + (S.spica ? C.spica : 0);
+      var base0 = fixed9() + S.base9 + S.cred * 500 + S.prem * 2500 + (spicaOn() ? C.spica : 0);
       var cs = Math.max(0, phOwned() - KEEP);
       var nN = Math.ceil(Math.max(0, r.target - base0) / 500), nO = Math.ceil(Math.max(0, r.target - base0 - C.oil) / 500);
       function w(n) { return n === 0 ? '売却不要で1回目に完了' : n <= cs ? 'フェニ尾' + n + '個売却で1回目に完了' : '1回目は不足 (2回目の買い物)'; }
@@ -829,12 +835,17 @@
       el.value = k === 'base11' ? effBase11() : S[k];
     });
     document.querySelectorAll('[data-chk]').forEach(function (el) { el.checked = !!S[el.getAttribute('data-chk')]; });
+    document.querySelectorAll('[data-chk="spica"]').forEach(function (el) { if (S.m9) el.checked = true; el.disabled = S.m9; });
+    $('spicaLbl').textContent = 'スピカ回収・売却 (+7,250G / 9章1回目の買い物)' + (S.m9 ? '［このタブは回収確定］' : '');
     var tsold = calc9().talSold;
     document.querySelectorAll('[data-sell]').forEach(function (el) { var i = +el.getAttribute('data-sell'); el.checked = sellOn(i); el.disabled = (i === 1 && tsold); });
     $('talNote').textContent = tsold ? '← 9章で売却済み' : '';
     document.querySelectorAll('#bioSeg button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-bio') === S.bio); });
     document.querySelectorAll('.tab').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-tab') === S.tab); });
-    $('pane9').classList.toggle('on', S.tab === '9');
+    $('pane9').classList.toggle('on', S.tab === '9' || S.tab === '9m');
+    $('h9').textContent = S.m9 ? '9章（医術改造） 買い物・オイル回収分岐' : '9章 買い物・オイル回収分岐';
+    $('fix9Note').textContent = '確定売却額 ' + fixed9().toLocaleString() + ' Gil ベース' + (S.m9 ? '（怪魔の翼x9を売らない）' : '');
+    $('row9kaima').style.display = S.m9 ? '' : 'none';
     $('pane11').classList.toggle('on', S.tab === '11');
   }
   function render() {
@@ -843,7 +854,7 @@
     S.prem = Math.min(S.prem || 0, MAXD.prem); S.cred = Math.min(S.cred || 0, MAXD.cred);
     S.rp = Math.min(S.rp || 0, MAXD.rp); S.rcb = Math.min(S.rcb || 0, MAXD.rcb); S.rc = Math.min(S.rc || 0, MAXD.rc);
     render9(); render11(); syncInputs();
-    var is9 = S.tab === '9';
+    var is9 = S.tab === '9' || S.tab === '9m';
     $('gilNum').textContent = (is9 ? calc9().income : total11()).toLocaleString();
     var gn = $('gilNote'), gm = '', gs = '', gc = '';
     if (is9) {
@@ -898,7 +909,7 @@
   });
   document.addEventListener('click', function (e) {
     var t = e.target.closest('button, .pat'); if (!t) return;
-    if (t.classList.contains('tab')) { S.tab = t.getAttribute('data-tab'); render(); return; }
+    if (t.classList.contains('tab')) { S.tab = t.getAttribute('data-tab'); if (S.tab !== '11') S.m9 = S.tab === '9m'; render(); return; }
     if (t.hasAttribute('data-phneed')) {
       var rr = calc9(), cs = Math.max(0, phOwned() - KEEP), ns = Math.ceil(Math.max(0, rr.shortSet) / 500), want = 0;
       if (rr.stage0 !== 'B') want = ns <= cs ? ns : (rr.tailsNeeded ? Math.ceil(rr.short0 / 500) : 0);
@@ -924,7 +935,7 @@
       if (t.getAttribute('data-arm') === '1') {
         clearTimeout(resetTimer);
         all.forEach(function (x) { x.removeAttribute('data-arm'); x.textContent = '全部リセット'; });
-        var keepTab = S.tab; S = defaults(); S.tab = keepTab; render();
+        var keepTab = S.tab, keepM9 = S.m9; S = defaults(); S.tab = keepTab; S.m9 = keepM9; render();
       } else {
         all.forEach(function (x) { x.setAttribute('data-arm', '1'); x.textContent = 'もう一度押すとリセット'; });
         resetTimer = setTimeout(function () { all.forEach(function (x) { x.removeAttribute('data-arm'); x.textContent = '全部リセット'; }); }, 4000);
