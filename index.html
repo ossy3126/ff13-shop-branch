@@ -266,7 +266,7 @@
         </div>
       </div>
 
-      <label class="opt" style="margin:12px 0 4px;"><span id="spicaLbl">スピカ回収・売却 (+7,250G / 9章1回目の買い物)</span><input type="checkbox" data-chk="spica"></label>
+      <label class="opt" id="spicaOpt" style="margin:12px 0 4px;"><span id="spicaLbl">スピカ回収・売却 (+7,250G / 9章1回目の買い物)</span><input type="checkbox" data-chk="spica"></label>
       <div class="note" id="spicaHint" style="margin:0 0 8px;line-height:1.6;"></div>
       <div class="sec secbtn" style="margin-top:16px;"><span>ドロップ</span><button class="link reset" data-reset="1">全部リセット</button></div>
       <div class="grid" style="margin-bottom:4px;">
@@ -334,10 +334,10 @@
       <div class="grid" style="margin-top:8px;">
         <div class="sub">
           <div class="row head"><span>所持金・売却額</span><span id="in9tot"></span></div>
-          <div class="row"><b>確定売却 (固定)</b><b>20,275 Gil</b></div>
-          <div class="row" id="row9kaima"><span>怪魔の翼x9 (医術改造用に売らない)</span><span>−1,350 Gil</span></div>
+          <div class="row"><b>確定売却 (固定)</b><b id="in9fix">20,275 Gil</b></div>
+          <div class="row" id="row9kaima"><span>└ 20,275 + スピカ 7,250 − 怪魔の翼x9 1,350 (売らない)</span><span></span></div>
           <div class="row"><span>シリコンオイルx4</span><span id="in9oil"></span></div>
-          <div class="row"><span>スピカ売却</span><span id="in9spica"></span></div>
+          <div class="row" id="row9spica"><span>スピカ売却</span><span id="in9spica"></span></div>
           <div class="row"><span>所持ギル</span><span id="in9base"></span></div>
           <div class="row"><span>チップ・フェニ尾売却</span><span id="in9drop"></span></div>
         </div>
@@ -505,10 +505,9 @@
 
   /* ---------- 計算 ---------- */
   PAT.forEach(function (p) { p.lab = 'ルート' + p.id.slice(1); });
-  // 9章（医術改造）タブはスピカ回収が確定
-  function spicaOn() { return S.m9 || !!S.spica; }
-  // 9章（医術改造）タブ：怪魔の翼x9を売らないので確定売却額から引く
-  function fixed9() { return C.fixed - (S.m9 ? C.kaima : 0); }
+  // 9章（医術改造）タブ：スピカ売却を確定売却に含め、怪魔の翼x9を売らない分を引く (スピカのチェックは使わない)
+  function spicaOn() { return !S.m9 && !!S.spica; }
+  function fixed9() { return C.fixed + (S.m9 ? C.spica - C.kaima : 0); }
   function calc9() {
     var bio = BIO[S.bio];
     var must = C.crank + bio.c;
@@ -835,8 +834,10 @@
       el.value = k === 'base11' ? effBase11() : S[k];
     });
     document.querySelectorAll('[data-chk]').forEach(function (el) { el.checked = !!S[el.getAttribute('data-chk')]; });
-    document.querySelectorAll('[data-chk="spica"]').forEach(function (el) { if (S.m9) el.checked = true; el.disabled = S.m9; });
-    $('spicaLbl').textContent = 'スピカ回収・売却 (+7,250G / 9章1回目の買い物)' + (S.m9 ? '［このタブは回収確定］' : '');
+    $('spicaOpt').style.display = S.m9 ? 'none' : '';
+    $('spicaHint').style.display = S.m9 ? 'none' : '';
+    $('row9spica').style.display = S.m9 ? 'none' : '';
+    $('in9fix').textContent = fixed9().toLocaleString() + ' Gil';
     var tsold = calc9().talSold;
     document.querySelectorAll('[data-sell]').forEach(function (el) { var i = +el.getAttribute('data-sell'); el.checked = sellOn(i); el.disabled = (i === 1 && tsold); });
     $('talNote').textContent = tsold ? '← 9章で売却済み' : '';
@@ -844,7 +845,7 @@
     document.querySelectorAll('.tab').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-tab') === S.tab); });
     $('pane9').classList.toggle('on', S.tab === '9' || S.tab === '9m');
     $('h9').textContent = S.m9 ? '9章（医術改造） 買い物・オイル回収分岐' : '9章 買い物・オイル回収分岐';
-    $('fix9Note').textContent = '確定売却額 ' + fixed9().toLocaleString() + ' Gil ベース' + (S.m9 ? '（怪魔の翼x9を売らない）' : '');
+    $('fix9Note').textContent = '確定売却額 ' + fixed9().toLocaleString() + ' Gil ベース' + (S.m9 ? '（スピカ売却込み・怪魔の翼x9は売らない）' : '');
     $('row9kaima').style.display = S.m9 ? '' : 'none';
     $('pane11').classList.toggle('on', S.tab === '11');
   }
